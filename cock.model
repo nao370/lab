@@ -4,7 +4,7 @@
 //                                                                    /
 //====================================================================/
 
-Version = 4.2;
+Version = 4.0;
 
 
 
@@ -44,7 +44,7 @@ UNIVERSE {
             Dim edge_flag(0, 0) As Boolean = (0);
             Dim T_al(0, 0) As Integer = (0);
             Dim vector_cul(0, 0)[2] As Double = (2*0.0);
-            Dim state(0, 0) As Integer = ();
+            Dim state(0, 0) As Integer = (0);
         }
         AgtType barrier(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
@@ -522,8 +522,21 @@ Agt_Step{
 		if in_central() then
 			do_central()
 		else
+			if is_touch_new_surface() then
+				move_new_surface()
+			else
+				do_peripheral()
+			end if
 		end if
 	end if
+}
+
+sub move_new_surface(){
+//新しい面に移る動き
+}
+
+sub do_peripheral(){
+//周辺部でどう動くか
 }
 
 sub do_stop() {
@@ -533,8 +546,26 @@ sub do_stop() {
 sub do_central(){
 //中央部でどう動くか
 	if is_stop_central() then
+		stop_insect()
 	else
+		if my.state != 2 then
+			decide_direction_and_distance()
+		end if
+		forward_one_step()
 	end if
+}
+
+sub forward_one_step(){
+/*
+1step分前進する
+もし途中で障害物があればその位置で止まる
+*/
+}
+
+sub decide_direction_and_distance(){
+/*
+ランダムウォークで次に進む方向とその距離を決定する
+*/
 }
 
 function in_central() as Boolean{
@@ -551,6 +582,22 @@ function is_stop_central() as Boolean{
 	/*
 	中央部において止まるかどうか。止まるならtrue,止まらないならfalseを返す
 	*/
+	ret = false
+	return ret
+}
+
+sub stop_insect(){
+/*
+1.停止時間を設定
+2.停止状態になる
+*/
+}
+
+function is_touch_new_surface()as Boolean{
+	dim ret as Boolean
+/*
+新しい面に触れていたらtrue,振れていなければfalseを返す
+*/
 	ret = false
 	return ret
 }
@@ -3584,7 +3631,7 @@ Time_Graph {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 0, 0, 416, 108;
+    Display_Area = 0, 0, 420, 116;
     Display_Type = 1;
     Panel_Item {
         Item_Type = Edit_Box;
@@ -3708,7 +3755,7 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -9, -9, 1618, 868;
+    Window_Name = Main_Window, -10, 0, 980, 1030;
     Window_Name = Output_Setting_Window, 743, 353, 480, 350;
     Window_Name = Artisoc_Help_Window, 10, 10, 400, 300;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
@@ -3720,60 +3767,4 @@ Window_Rectangle {
 // Help Favorite Division
 //-------------------------------------------------------
 Help_Favorite {
-}
-
-
-//-------------------------------------------------------
-// Model Description Division
-//-------------------------------------------------------
-Model_Description {
-    Universe {
-        Function Univ_Init {
-        }
-        Function read_barrier {
-        }
-        Function write_parameter {
-        }
-        Function make_void {
-        }
-        Function Univ_Step_Begin {
-        }
-        Function Univ_Step_End {
-        }
-        Function write_csv {
-        }
-        Function Univ_Finish {
-        }
-        Function make_rubble_mix {
-        }
-        Function make_rubble_board {
-        }
-        Function make_rubble_box {
-        }
-        Function make_rubble_Pillar {
-        }
-    }
-    Space Universe.map {
-    }
-    Agent Universe.map.insect {
-        Variable state = "サイボーグインセクトの状態\n0 : 停止状態\n1 : 動作状態\n2 : ランダムウォーク状態";
-        Function Agt_Init {
-        }
-        Function Agt_Step {
-        }
-        Function do_stop {
-        }
-        Function do_central {
-        }
-        Function in_central {
-        }
-        Function is_stop_central {
-        }
-    }
-    Agent Universe.map.barrier {
-        Function Agt_Init {
-        }
-        Function Agt_Step {
-        }
-    }
 }
