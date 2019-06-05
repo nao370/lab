@@ -608,6 +608,32 @@ function is_touch_new_surface()as Boolean{
 	return ret
 }
 
+sub step_direction(){
+/*
+ 	1step分前進する
+ 	位置をオーバーしてたら元に戻す
+*/
+	my.X = my.X + my.forward_vector(0) * 0.6
+	my.Y = my.Y + my.forward_vector(1) * 0.6
+	my.Z = my.Z + my.forward_vector(2) * 0.6
+
+	if my.X =< 1 then
+		my.X = 1
+	elseif my.X => GetWidthSpace(universe.map) - 1 then
+		my.X = GetWidthSpace(universe.map) - 1
+	end if
+	if my.y < 1 then
+		my.y = 1
+	elseif my.X => GetHeightSpace(universe.map) - 1 then
+		my.y = GetHeightSpace(universe.map) - 1
+	end if
+	if my.z =< 0 then
+		my.z = 0
+	elseif my.Z => 39 then
+		my.Z = 39
+	end if
+}
+
 /*
 function check_void(x as Double,y as Double,z as Double) as Integer{
 	dim ret as Integer
@@ -1111,23 +1137,6 @@ sub prev_forward(){
 	my.do_type = GetHistory(my.do_type,1)
 }
 
-sub step_direction(){
-
-	my.X = my.X + my.forward_vector(0) * 0.6
-	my.Y = my.Y + my.forward_vector(1) * 0.6
-	my.Z = my.Z + my.forward_vector(2) * 0.6
-
-	if my.X < 0 then
-		my.X = 0
-	end if
-	if my.y < 0 then
-		my.y = 0
-	end if
-	if my.z < 0 then
-		my.z = 0
-	end if
-
-}
 
 function is_step() as Boolean{
 	dim ret as Boolean
