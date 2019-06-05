@@ -44,7 +44,8 @@ UNIVERSE {
             Dim edge_flag(0, 0) As Boolean = (0);
             Dim T_al(0, 0) As Integer = (0);
             Dim vector_cul(0, 0)[2] As Double = (2*0.0);
-            Dim state(0, 0) As Integer = (0);
+            Dim state(0, 0) As Integer = ();
+            Dim stop_time(0, 0) As Integer = ();
         }
         AgtType barrier(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
@@ -541,6 +542,11 @@ sub do_peripheral(){
 
 sub do_stop() {
 //’âŽ~ó‘Ô‚Å‚Ç‚¤“®‚­‚©
+	if my.stop_time > 0 then
+		my.stop_time = my.stop_time - 1
+	else
+		my.state = 0
+	end if
 }
 
 sub do_central(){
@@ -3698,8 +3704,8 @@ Others_Data {
     Console_Position_y = -23;
     Console_Size_x = 716;
     Console_Size_y = 1072;
-    Componen_Tree_Position_x = 3;
-    Componen_Tree_Position_y = 3;
+    Componen_Tree_Position_x = -24;
+    Componen_Tree_Position_y = -3;
     Componen_Tree_Size_x = 250;
     Componen_Tree_Size_y = 400;
     Console_Background_Color = 16777215;
