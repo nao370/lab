@@ -960,8 +960,421 @@ sub back_0(){
 	end if
 }
 
+function is_pause() as Boolean{
+//G‚Á‚Ä‚é–Ê‚ª“rØ‚ê‚½‚çtrue‚ğ•Ô‚·
+	dim type as Integer
+	dim ret as Boolean
+	dim nx as Integer
+	dim ny as Integer
+	dim nz as Integer
+	dim p(3) as Integer
+	dim f(3) as Double
+	dim i as Integer
+	dim minus(3) as Integer
 
-/*
+	for i = 0 to 2
+		if my.forward_vector(i) != 0 then
+			f(i) = My.forward_vector(i)
+			f(i) = f(i) / Abs(f(i))
+		else
+			f(i) = 0
+		end if
+		if f(i) < 0 then
+			minus(i) = 1
+		else
+			minus(i) = 0
+		end if
+	next i
+	
+	nx = Int(my.X)// + minus(0)
+	ny = Int(my.Y)// + minus(1)
+	nz = Int(my.Z)// + minus(2)
+
+	p(0) = Int(GetHistory(my.X,1))
+	p(1) = Int(GetHistory(my.Y,1))
+	p(2) = Int(GetHistory(my.Z,1))
+
+
+	if nx != my.X then
+		nx = nx + minus(0)
+		p(0) = p(0) + minus(0)
+	end if
+	if ny != my.y then
+		ny = ny + minus(1)
+		p(1) = p(1) + minus(1)
+	end if
+	if nz != my.z then
+		nz = nz + minus(2)
+		p(2) = p(2) + minus(2)
+	end if
+	
+	
+	type = my.do_type
+
+	if my.is_back or GetHistory(my.do_type,1) == 1 or GetHistory(my.do_type,1) == 2 or GetHistory(my.do_type,1) == 4 then
+		ret = false
+		return ret 
+	end if
+
+	if type == 0 then
+		if my.normal_vector(1) == 0 then
+			if my.touch(1) != 0 then
+				if ny == 0 and my.touch(1) > 0 then
+					ret = false
+				else
+					if nx == 0 then
+						ret = false
+					elseif check_void(nx,ny - my.touch(1),nz) == 1 and check_void(nx+f(0),ny - my.touch(1),nz) == 0 then
+						if my.X == nx or p(0) == nx then
+							ret = false
+						else
+							ret = true
+						end if
+					else
+						ret = false
+					end if
+				end if
+			else
+				ret = false
+			end if
+		else
+			if my.touch(2) != 0 then
+				if nz == 0 and my.touch(2) > 0 then
+					ret = false
+				else
+					if nx == 0 then
+						ret = false
+					elseif check_void(nx,ny,nz - my.touch(2)) == 1 and check_void(nx+f(0),ny,nz - my.touch(2)) == 0 then
+						if my.X == nx or p(0) == nx then
+							ret = false
+						else
+							ret = true
+						end if
+					else
+						ret = false
+					end if
+				end if
+			else
+				ret = false
+			end if
+		end if
+	elseif type == 1 then
+		ret = false
+	elseif type == 2 then
+		ret = false
+	elseif type == 3 then
+		if my.normal_vector(0) == 0 then
+			if my.touch(0) != 0 then
+				if nx == 0 and my.touch(0) > 0 then
+					ret = false
+				else
+					if ny == 0 then
+						ret = false
+					elseif check_void(nx - my.touch(0),ny,nz) == 1 and check_void(nx - my.touch(0),ny+f(1),nz) == 0 then
+						if my.Y == ny or p(1) == ny then
+							ret = false
+						else
+							ret = true
+						end if
+					else
+						ret = false
+					end if
+				end if
+			else
+				ret = false
+			end if
+		else
+			if my.touch(2) != 0 then
+				if nz == 0 and my.touch(2) > 0 then
+					ret = false
+				else
+					if ny == 0 then
+						ret = false
+					elseif check_void(nx,ny,nz - my.touch(2)) == 1 and check_void(nx,ny+f(1),nz - my.touch(2)) == 0 then
+						if my.Y == ny or p(1) == ny then
+							ret = false
+						else
+							ret = true
+						end if
+					else
+						ret = false
+					end if
+				end if
+			else
+				ret = false
+			end if
+		end if
+	elseif type == 4 then
+		ret = false
+	else
+		if my.normal_vector(0) == 0 then
+			if my.touch(0) != 0 then
+				if nx == 0 and my.touch(0) > 0 then
+					ret = false
+				else
+					if nz == 0 then
+						ret = false
+					elseif check_void(nx - my.touch(0),ny,nz) == 1 and check_void(nx - my.touch(0),ny,nz+f(2)) == 0 then
+						if my.Z == nz or p(2) == nz then
+							ret = false
+						else
+							ret = true
+							//DebugStr("5")
+						end if
+					else
+						ret = false
+					end if
+				end if
+			else
+				ret = false
+			end if
+		else
+			if my.touch(1) != 0 then
+				if ny == 0 and my.touch(1) > 0 then
+					ret = false
+				else
+					if nz == 0 then
+						ret = false
+					elseif check_void(nx,ny - my.touch(1),nz) == 1 and check_void(nx,ny - my.touch(1),nz+f(2)) == 0 then
+						if my.Z == nz or p(2) == nz then
+							ret = false
+						else
+							ret = true
+							//DebugStr("6")
+						end if
+					else
+						ret = false
+					end if
+				end if
+			else
+				ret = false
+			end if
+		end if
+	end if
+
+	return ret
+}
+
+function is_jump() as Boolean{
+//‚³‚Á‚«‚Ü‚Å‚Ì–Ê‚ğ”ò‚Ño‚µ‚½‚©‚Ç‚¤‚©
+	dim type as Integer
+	dim ret as Boolean
+	dim nx as Integer
+	dim ny as Integer
+	dim nz as Integer
+
+	nx = Int(my.X)
+	ny = Int(my.Y)
+	nz = Int(my.Z)
+	
+	type = my.do_type
+
+	if type == 0 then
+		if my.normal_vector(1) == 0 then
+			if nz == 0 and my.normal_vector(2) > 0 then
+				ret = false
+			else
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 then
+					ret = false
+				else
+					if my.X == nx then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			end if
+		else
+			if ny == 0 and my.normal_vector(1) > 0 then
+				ret = false
+			else
+				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx+1,ny - my.normal_vector(1),nz) == 1 then
+					ret = false
+				else
+					if my.x == nx then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			end if
+		end if
+	elseif type == 1 then
+		if nz == 0 and my.normal_vector(2) > 0 then
+			ret = false
+		else
+			if ny == my.Y then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 then
+					ret = false
+				else
+					if my.x == nx then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			elseif nx == my.X then
+				if check_void(nx,ny ,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 then
+					ret = false
+				else
+					if my.y == ny then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			else
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny+1,nz - my.normal_vector(2)) == 1  then
+					ret = false
+				else
+					ret = true
+				end if
+			end if
+		end if
+	elseif type == 2 then
+		if ny == 0 and my.normal_vector(1) > 0 then
+			ret = false
+		else
+			if nz == my.z then
+				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz) == 1 then
+					ret = false
+				else
+					if my.x == nx then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			elseif nx == my.X then
+				if check_void(nx,ny- my.normal_vector(1) ,nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+1) == 1 then
+					ret = false
+				else
+					if my.Z == nz then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			else
+				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+1) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz+1) == 1  then
+					ret = false
+				else
+					ret = true
+				end if
+			end if
+		end if
+	elseif type == 3 then
+		if my.normal_vector(0) == 0 then
+			if nz == 0 and my.normal_vector(2) > 0 then
+				ret = false
+			else
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 then
+					ret = false
+				else
+					if my.y == ny then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			end if
+		else
+			if nx == 0 and my.normal_vector(0) > 0 then
+				ret = false
+			else
+				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny+1,nz) == 1 then
+					ret = false
+				else
+					if my.y == ny then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			end if
+		end if
+	elseif type == 4 then
+		if nx == 0 and my.normal_vector(0) > 0 then
+			ret = false
+		else
+			if nz == my.z then
+				if check_void(nx- my.normal_vector(0),ny,nz)==1 and check_void(nx- my.normal_vector(0),ny+1,nz) == 1 then
+					ret = false
+				else
+					if my.y == ny then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			elseif ny == my.y then
+				if check_void(nx- my.normal_vector(0),ny ,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+1) == 1 then
+					ret = false
+				else
+					if my.Z == nz then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			else
+				if check_void(nx- my.normal_vector(0),ny,nz) == 1 and check_void(nx- my.normal_vector(0),ny+1,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+1) == 1 and check_void(nx- my.normal_vector(0),ny+1,nz+1) == 1  then
+					ret = false
+				else
+					ret = true
+				end if
+			end if
+		end if
+	else
+		if my.normal_vector(0) == 0 then
+			if ny == 0 and my.normal_vector(1) > 0 then
+				ret = false
+			else
+				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx,ny - my.normal_vector(1),nz+1) == 1 then
+					ret = false
+				else
+					if my.Z == nz then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			end if
+		else
+			if nx == 0 and my.normal_vector(0) > 0 then
+				ret = false
+			else
+				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny,nz+1) == 1 then
+					ret = false
+				else
+					if my.Z == nz then
+							ret = false
+						else
+							ret = true
+						end if
+				end if
+			end if
+		end if
+	end if
+
+	return ret
+}
+
+function close_num(x as Double) as Integer{
+	dim n as Integer
+	dim ret as Integer
+
+	n = Int(x)
+
+	if x - n >= 0.5 then
+		ret = n + 1
+	else
+		ret = n
+	end if
+
+	return ret
+}
+
 function check_void(x as Double,y as Double,z as Double) as Integer{
 	dim ret as Integer
 	dim max(3) as Integer
@@ -978,6 +1391,8 @@ function check_void(x as Double,y as Double,z as Double) as Integer{
 		return 0
 	end if
 }
+
+/*
 
 sub print_all(){
 	DebugStr("ID :"&my.ID)
@@ -1429,420 +1844,6 @@ sub prev_forward(){
 	my.do_type = GetHistory(my.do_type,1)
 }
 
-function is_pause() as Boolean{
-//G‚Á‚Ä‚é–Ê‚ª“rØ‚ê‚½‚çtrue‚ğ•Ô‚·
-	dim type as Integer
-	dim ret as Boolean
-	dim nx as Integer
-	dim ny as Integer
-	dim nz as Integer
-	dim p(3) as Integer
-	dim f(3) as Double
-	dim i as Integer
-	dim minus(3) as Integer
-
-	for i = 0 to 2
-		if my.forward_vector(i) != 0 then
-			f(i) = My.forward_vector(i)
-			f(i) = f(i) / Abs(f(i))
-		else
-			f(i) = 0
-		end if
-		if f(i) < 0 then
-			minus(i) = 1
-		else
-			minus(i) = 0
-		end if
-	next i
-	
-	nx = Int(my.X)// + minus(0)
-	ny = Int(my.Y)// + minus(1)
-	nz = Int(my.Z)// + minus(2)
-
-	p(0) = Int(GetHistory(my.X,1))
-	p(1) = Int(GetHistory(my.Y,1))
-	p(2) = Int(GetHistory(my.Z,1))
-
-
-	if nx != my.X then
-		nx = nx + minus(0)
-		p(0) = p(0) + minus(0)
-	end if
-	if ny != my.y then
-		ny = ny + minus(1)
-		p(1) = p(1) + minus(1)
-	end if
-	if nz != my.z then
-		nz = nz + minus(2)
-		p(2) = p(2) + minus(2)
-	end if
-	
-	
-	type = my.do_type
-
-	if my.is_back or GetHistory(my.do_type,1) == 1 or GetHistory(my.do_type,1) == 2 or GetHistory(my.do_type,1) == 4 then
-		ret = false
-		return ret 
-	end if
-
-	if type == 0 then
-		if my.normal_vector(1) == 0 then
-			if my.touch(1) != 0 then
-				if ny == 0 and my.touch(1) > 0 then
-					ret = false
-				else
-					if nx == 0 then
-						ret = false
-					elseif check_void(nx,ny - my.touch(1),nz) == 1 and check_void(nx+f(0),ny - my.touch(1),nz) == 0 then
-						if my.X == nx or p(0) == nx then
-							ret = false
-						else
-							ret = true
-						end if
-					else
-						ret = false
-					end if
-				end if
-			else
-				ret = false
-			end if
-		else
-			if my.touch(2) != 0 then
-				if nz == 0 and my.touch(2) > 0 then
-					ret = false
-				else
-					if nx == 0 then
-						ret = false
-					elseif check_void(nx,ny,nz - my.touch(2)) == 1 and check_void(nx+f(0),ny,nz - my.touch(2)) == 0 then
-						if my.X == nx or p(0) == nx then
-							ret = false
-						else
-							ret = true
-						end if
-					else
-						ret = false
-					end if
-				end if
-			else
-				ret = false
-			end if
-		end if
-	elseif type == 1 then
-		ret = false
-	elseif type == 2 then
-		ret = false
-	elseif type == 3 then
-		if my.normal_vector(0) == 0 then
-			if my.touch(0) != 0 then
-				if nx == 0 and my.touch(0) > 0 then
-					ret = false
-				else
-					if ny == 0 then
-						ret = false
-					elseif check_void(nx - my.touch(0),ny,nz) == 1 and check_void(nx - my.touch(0),ny+f(1),nz) == 0 then
-						if my.Y == ny or p(1) == ny then
-							ret = false
-						else
-							ret = true
-						end if
-					else
-						ret = false
-					end if
-				end if
-			else
-				ret = false
-			end if
-		else
-			if my.touch(2) != 0 then
-				if nz == 0 and my.touch(2) > 0 then
-					ret = false
-				else
-					if ny == 0 then
-						ret = false
-					elseif check_void(nx,ny,nz - my.touch(2)) == 1 and check_void(nx,ny+f(1),nz - my.touch(2)) == 0 then
-						if my.Y == ny or p(1) == ny then
-							ret = false
-						else
-							ret = true
-						end if
-					else
-						ret = false
-					end if
-				end if
-			else
-				ret = false
-			end if
-		end if
-	elseif type == 4 then
-		ret = false
-	else
-		if my.normal_vector(0) == 0 then
-			if my.touch(0) != 0 then
-				if nx == 0 and my.touch(0) > 0 then
-					ret = false
-				else
-					if nz == 0 then
-						ret = false
-					elseif check_void(nx - my.touch(0),ny,nz) == 1 and check_void(nx - my.touch(0),ny,nz+f(2)) == 0 then
-						if my.Z == nz or p(2) == nz then
-							ret = false
-						else
-							ret = true
-							//DebugStr("5")
-						end if
-					else
-						ret = false
-					end if
-				end if
-			else
-				ret = false
-			end if
-		else
-			if my.touch(1) != 0 then
-				if ny == 0 and my.touch(1) > 0 then
-					ret = false
-				else
-					if nz == 0 then
-						ret = false
-					elseif check_void(nx,ny - my.touch(1),nz) == 1 and check_void(nx,ny - my.touch(1),nz+f(2)) == 0 then
-						if my.Z == nz or p(2) == nz then
-							ret = false
-						else
-							ret = true
-							//DebugStr("6")
-						end if
-					else
-						ret = false
-					end if
-				end if
-			else
-				ret = false
-			end if
-		end if
-	end if
-
-	return ret
-}
-
-function is_jump() as Boolean{
-//‚³‚Á‚«‚Ü‚Å‚Ì–Ê‚ğ”ò‚Ño‚µ‚½‚©‚Ç‚¤‚©
-	dim type as Integer
-	dim ret as Boolean
-	dim nx as Integer
-	dim ny as Integer
-	dim nz as Integer
-
-	nx = Int(my.X)
-	ny = Int(my.Y)
-	nz = Int(my.Z)
-	
-	type = my.do_type
-
-	if type == 0 then
-		if my.normal_vector(1) == 0 then
-			if nz == 0 and my.normal_vector(2) > 0 then
-				ret = false
-			else
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 then
-					ret = false
-				else
-					if my.X == nx then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			end if
-		else
-			if ny == 0 and my.normal_vector(1) > 0 then
-				ret = false
-			else
-				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx+1,ny - my.normal_vector(1),nz) == 1 then
-					ret = false
-				else
-					if my.x == nx then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			end if
-		end if
-	elseif type == 1 then
-		if nz == 0 and my.normal_vector(2) > 0 then
-			ret = false
-		else
-			if ny == my.Y then
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 then
-					ret = false
-				else
-					if my.x == nx then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			elseif nx == my.X then
-				if check_void(nx,ny ,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 then
-					ret = false
-				else
-					if my.y == ny then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			else
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny+1,nz - my.normal_vector(2)) == 1  then
-					ret = false
-				else
-					ret = true
-				end if
-			end if
-		end if
-	elseif type == 2 then
-		if ny == 0 and my.normal_vector(1) > 0 then
-			ret = false
-		else
-			if nz == my.z then
-				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz) == 1 then
-					ret = false
-				else
-					if my.x == nx then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			elseif nx == my.X then
-				if check_void(nx,ny- my.normal_vector(1) ,nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+1) == 1 then
-					ret = false
-				else
-					if my.Z == nz then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			else
-				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+1) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz+1) == 1  then
-					ret = false
-				else
-					ret = true
-				end if
-			end if
-		end if
-	elseif type == 3 then
-		if my.normal_vector(0) == 0 then
-			if nz == 0 and my.normal_vector(2) > 0 then
-				ret = false
-			else
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 then
-					ret = false
-				else
-					if my.y == ny then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			end if
-		else
-			if nx == 0 and my.normal_vector(0) > 0 then
-				ret = false
-			else
-				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny+1,nz) == 1 then
-					ret = false
-				else
-					if my.y == ny then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			end if
-		end if
-	elseif type == 4 then
-		if nx == 0 and my.normal_vector(0) > 0 then
-			ret = false
-		else
-			if nz == my.z then
-				if check_void(nx- my.normal_vector(0),ny,nz)==1 and check_void(nx- my.normal_vector(0),ny+1,nz) == 1 then
-					ret = false
-				else
-					if my.y == ny then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			elseif ny == my.y then
-				if check_void(nx- my.normal_vector(0),ny ,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+1) == 1 then
-					ret = false
-				else
-					if my.Z == nz then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			else
-				if check_void(nx- my.normal_vector(0),ny,nz) == 1 and check_void(nx- my.normal_vector(0),ny+1,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+1) == 1 and check_void(nx- my.normal_vector(0),ny+1,nz+1) == 1  then
-					ret = false
-				else
-					ret = true
-				end if
-			end if
-		end if
-	else
-		if my.normal_vector(0) == 0 then
-			if ny == 0 and my.normal_vector(1) > 0 then
-				ret = false
-			else
-				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx,ny - my.normal_vector(1),nz+1) == 1 then
-					ret = false
-				else
-					if my.Z == nz then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			end if
-		else
-			if nx == 0 and my.normal_vector(0) > 0 then
-				ret = false
-			else
-				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny,nz+1) == 1 then
-					ret = false
-				else
-					if my.Z == nz then
-							ret = false
-						else
-							ret = true
-						end if
-				end if
-			end if
-		end if
-	end if
-
-	return ret
-}
-
-function close_num(x as Double) as Integer{
-	dim n as Integer
-	dim ret as Integer
-
-	n = Int(x)
-
-	if x - n >= 0.5 then
-		ret = n + 1
-	else
-		ret = n
-	end if
-
-	return ret
-}
 
 function type_gap(x as Double,a as Integer) as Integer{
 	dim ret as Integer
