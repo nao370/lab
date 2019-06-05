@@ -566,6 +566,13 @@ sub forward_one_step(){
 1step分前進する
 もし途中で障害物があればその位置で止まる
 */
+	step_direction()
+	delete_touch_vector()
+	update_normal()
+
+	if not is_step() then
+		back_step()
+	end if
 }
 
 sub decide_direction_and_distance(){
@@ -617,6 +624,325 @@ sub step_direction(){
 	my.Y = my.Y + my.forward_vector(1) * 0.6
 	my.Z = my.Z + my.forward_vector(2) * 0.6
 
+	back_0()
+}
+
+sub delete_touch_vector(){
+//あり得ないtouchを消す
+	dim type as Integer
+
+	type = my.do_type
+	
+	if type == 0 then
+		my.touch(0) = 0
+	elseif type == 1 then
+		my.touch(0) = 0
+		my.touch(1) = 0
+	elseif type == 2 then
+		my.touch(0) = 0
+		my.touch(2) = 0
+	elseif type == 3 then
+		my.touch(1) = 0
+	elseif type == 4 then
+		my.touch(1) = 0
+		my.touch(2) = 0
+	else
+		my.touch(2) = 0
+	end if
+}
+
+sub update_normal(){
+//normalの正負を合わせる
+	dim i as Integer
+
+	for i = 0 to 2
+		if my.normal_vector(i) != 0 then
+			my.normal_vector(i) = my.touch(i)
+		end if
+	next i
+}
+
+function is_step() as Boolean{
+	dim ret as Boolean
+
+	if is_filled() then
+		ret = false
+	else
+		if is_float() then
+			ret = false
+		else
+			if not is_jump() then
+				if is_pause() then
+					ret = false
+				else
+					ret = true
+				end if
+			else
+				ret = false
+			end if
+		end if
+	end if
+
+	return ret
+}
+
+function is_filled() as Boolean{
+	dim i as Integer
+	dim j as Integer
+	dim k as Integer
+	dim a(3) as Integer
+	dim x(3) as Double
+	dim g(3) as Integer
+	dim ret as Boolean
+
+	x(0) = my.X
+	x(1) = my.Y
+	x(2) = my.Z
+
+		//DebugStr("近いマス")
+	for i = 0 to 2
+		a(i) = close_num(x(i))
+		//DebugStr("a("&i&")"&"is"&a(i))
+	next i
+
+	ret = false
+	for i = 0 to 2
+		if a(i) == 0 then
+			g(i) = 0
+		else
+			g(i) = 1
+		end if
+	next i
+	
+	for k = 0 to (1 + g(2))
+	 for j = 0 to (1 + g(1))
+	 	for i = 0 to (1 + g(0))
+			if check_void(a(0)-g(0)+i,a(1)-g(1)+j,a(2)-g(2)+k) == 1 then
+	 			if abs(a(0) - g(0) + i  - my.X) < 1 and abs(a(1) - g(1) + j  - my.y) < 1 and abs(a(2) - g(2) + k  - my.z) < 1 then
+	 				ret = true
+	 				return ret
+	 			end if
+	 		end if
+	 	next i
+	 next j
+	next k
+
+	return ret
+}
+
+function is_float() as Boolean{
+	dim i as Integer
+	dim j as Integer
+	dim k as Integer
+	dim a(3) as Integer
+	dim x(3) as Double
+	dim g(3) as Integer
+	dim ret as Boolean
+
+	x(0) = my.X
+	x(1) = my.Y
+	x(2) = my.Z
+
+	for i = 0 to 2
+		a(i) = close_num(x(i))
+	next i
+
+	ret = false
+	for i = 0 to 2
+		if a(i) == 0 then
+			g(i) = 0
+		else
+			g(i) = 1
+		end if
+	next i
+
+	if x(0) == 0 or x(1) == 0 or x(2) == 0 then
+		ret = false
+		return ret
+	end if
+	
+	for k = 0 to (1 + g(2))
+	 for j = 0 to (1 + g(1))
+	 	for i = 0 to (1 + g(0))
+	 		if check_void(a(0)-g(0)+i,a(1)-g(1)+j,a(2)-g(2)+k) == 1 then
+	 			if abs(a(0) - g(0) + i  - my.X) > 1 and abs(a(1) - g(1) + j  - my.y) > 1 and abs(a(2) - g(2) + k  - my.z) > 1 then
+	 				ret = true
+	 				return ret
+	 			end if
+	 		end if
+	 	next i
+	 next j
+	next k
+
+	return ret
+}
+
+sub back_step(){
+	dim n(3) as Integer
+	dim diff_x as Double
+	dim diff_y as Double
+	dim diff_z as Double
+	dim pre(3) as Double
+	dim u(3) as Double
+	dim k(3) as Double
+	dim pre_n(3) as Double
+	dim i as Integer
+	dim ak(3) as Double 
+
+	pre(0) = GetHistory(my.X,1)
+	pre(1) = GetHistory(my.y,1)
+	pre(2) = GetHistory(my.z,1)
+
+	k(0) = 0
+	k(1) = 0
+	k(2) = 0
+
+	u(0) = my.forward_vector(0)//my.X - pre_x
+	u(1) = my.forward_vector(1)//my.y - pre_y
+	u(2) = my.forward_vector(2)//my.z - pre_z
+
+	n(0) = Int(my.X)
+	n(1) = Int(my.Y)
+	n(2) = Int(my.Z)
+
+	pre_n(0) = Int(pre(0))
+	pre_n(1) = Int(pre(1))
+	pre_n(2) = Int(pre(2))
+
+	for i = 0 to 2
+		if n(i) == pre_n(i) or u(i) == 0 then
+			k(i) = 0
+		else
+			if n(i) > pre_n(i) then
+				k(i) = (n(i) - pre(i)) / u(i)
+			else
+				k(i) = (pre_n(i) - pre(i)) / u(i)
+			end if
+		end if
+		ak(i) = Abs(k(i))
+		if k(i) < 0 then
+			k(i) = 0
+		end if
+	next i
+
+	if ak(0) <= ak(1) and ak(1) <= ak(2) then
+		my.X = pre(0) + k(2) * u(0)
+		my.y = pre(1) + k(2) * u(1)
+		my.z = pre(2) + k(2) * u(2)
+		back_0()
+		
+		if not is_step() then
+			my.X = pre(0) + k(1) * u(0)
+			my.y = pre(1) + k(1) * u(1)
+			my.z = pre(2) + k(1) * u(2)
+			back_0()
+
+			if not is_step() then
+				my.X = pre(0) + k(0) * u(0)
+				my.y = pre(1) + k(0) * u(1)
+				my.z = pre(2) + k(0) * u(2)
+				back_0()
+			end if
+		end if
+	elseif ak(0) <= ak(2) and ak(2) <= ak(1) then
+		my.X = pre(0) + k(1) * u(0)
+		my.y = pre(1) + k(1) * u(1)
+		my.z = pre(2) + k(1) * u(2)
+		back_0()
+
+		if not is_step() then
+			my.X = pre(0) + k(2) * u(0)
+			my.y = pre(1) + k(2) * u(1)
+			my.z = pre(2) + k(2) * u(2)
+			back_0()
+
+			if not is_step() then
+				my.X = pre(0) + k(0) * u(0)
+				my.y = pre(1) + k(0) * u(1)
+				my.z = pre(2) + k(0) * u(2)
+				back_0()
+			end if
+		end if
+	elseif ak(1) <= ak(0) and k(0) <= ak(2) then
+		my.X = pre(0) + k(2) * u(0)
+		my.y = pre(1) + k(2) * u(1)
+		my.z = pre(2) + k(2) * u(2)
+		back_0()
+
+		if not is_step() then
+			my.X = pre(0) + k(0) * u(0)
+			my.y = pre(1) + k(0) * u(1)
+			my.z = pre(2) + k(0) * u(2)
+			back_0()
+
+			if not is_step() then
+				my.X = pre(0) + k(1) * u(0)
+				my.y = pre(1) + k(1) * u(1)
+				my.z = pre(2) + k(1) * u(2)
+				back_0()
+			end if
+		end if
+	elseif ak(1) <= ak(2) and k(2) <= ak(0) then
+		my.X = pre(0) + k(0) * u(0)
+		my.y = pre(1) + k(0) * u(1)
+		my.z = pre(2) + k(0) * u(2)
+		back_0()
+
+		if not is_step() then
+			my.X = pre(0) + k(2) * u(0)
+			my.y = pre(1) + k(2) * u(1)
+			my.z = pre(2) + k(2) * u(2)
+			back_0()
+
+			if not is_step() then
+				my.X = pre(0) + k(1) * u(0)
+				my.y = pre(1) + k(1) * u(1)
+				my.z = pre(2) + k(1) * u(2)
+				back_0()
+			end if
+		end if
+	elseif ak(2) <= ak(0) and k(0) <= ak(1) then
+		my.X = pre(0) + k(1) * u(0)
+		my.y = pre(1) + k(1) * u(1)
+		my.z = pre(2) + k(1) * u(2)
+		back_0()
+
+		if not is_step() then
+			my.X = pre(0) + k(0) * u(0)
+			my.y = pre(1) + k(0) * u(1)
+			my.z = pre(2) + k(0) * u(2)
+			back_0()
+
+			if not is_step() then
+				my.X = pre(0) + k(2) * u(0)
+				my.y = pre(1) + k(2) * u(1)
+				my.z = pre(2) + k(2) * u(2)
+				back_0()
+			end if
+		end if
+	else			
+		my.X = pre(0) + k(0) * u(0)
+		my.y = pre(1) + k(0) * u(1)
+		my.z = pre(2) + k(0) * u(2)
+		back_0()
+
+		if not is_step() then
+			my.X = pre(0) + k(1) * u(0)
+			my.y = pre(1) + k(1) * u(1)
+			my.z = pre(2) + k(1) * u(2)
+			back_0()
+
+			if not is_step() then
+				my.X = pre(0) + k(2) * u(0)
+				my.y = pre(1) + k(2) * u(1)
+				my.z = pre(2) + k(2) * u(2)
+				back_0()
+			end if
+		end if
+	end if
+}
+
+sub back_0(){
 	if my.X =< 1 then
 		my.X = 1
 	elseif my.X => GetWidthSpace(universe.map) - 1 then
@@ -633,6 +959,7 @@ sub step_direction(){
 		my.Z = 39
 	end if
 }
+
 
 /*
 function check_void(x as Double,y as Double,z as Double) as Integer{
@@ -971,41 +1298,6 @@ sub update_normal_vector(){
 
 }
 
-sub delete_touch_vector(){
-//あり得ないtouchを消す
-	dim type as Integer
-
-	type = my.do_type
-	
-	if type == 0 then
-		my.touch(0) = 0
-	elseif type == 1 then
-		my.touch(0) = 0
-		my.touch(1) = 0
-	elseif type == 2 then
-		my.touch(0) = 0
-		my.touch(2) = 0
-	elseif type == 3 then
-		my.touch(1) = 0
-	elseif type == 4 then
-		my.touch(1) = 0
-		my.touch(2) = 0
-	else
-		my.touch(2) = 0
-	end if
-}
-
-sub update_normal(){
-//normalの正負を合わせるため
-	dim i as Integer
-
-	for i = 0 to 2
-		if my.normal_vector(i) != 0 then
-			my.normal_vector(i) = my.touch(i)
-		end if
-	next i
-}
-
 sub forward_step() {
 
 	if is_differernt() then
@@ -1135,31 +1427,6 @@ sub prev_forward(){
 		my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
 	next i
 	my.do_type = GetHistory(my.do_type,1)
-}
-
-
-function is_step() as Boolean{
-	dim ret as Boolean
-
-	if is_filled() then
-		ret = false
-	else
-		if is_float() then
-			ret = false
-		else
-			if not is_jump() then
-				if is_pause() then
-					ret = false
-				else
-					ret = true
-				end if
-			else
-				ret = false
-			end if
-		end if
-	end if
-
-	return ret
 }
 
 function is_pause() as Boolean{
@@ -1590,276 +1857,6 @@ function type_gap(x as Double,a as Integer) as Integer{
 
 	return ret
 }
-
-function is_filled() as Boolean{
-	dim i as Integer
-	dim j as Integer
-	dim k as Integer
-	dim a(3) as Integer
-	dim x(3) as Double
-	dim g(3) as Integer
-	dim ret as Boolean
-
-	x(0) = my.X
-	x(1) = my.Y
-	x(2) = my.Z
-
-		//DebugStr("近いマス")
-	for i = 0 to 2
-		a(i) = close_num(x(i))
-		//DebugStr("a("&i&")"&"is"&a(i))
-	next i
-
-	ret = false
-	for i = 0 to 2
-		if a(i) == 0 then
-			g(i) = 0
-		else
-			g(i) = 1
-		end if
-	next i
-	
-	for k = 0 to (1 + g(2))
-	 for j = 0 to (1 + g(1))
-	 	for i = 0 to (1 + g(0))
-			if check_void(a(0)-g(0)+i,a(1)-g(1)+j,a(2)-g(2)+k) == 1 then
-	 			if abs(a(0) - g(0) + i  - my.X) < 1 and abs(a(1) - g(1) + j  - my.y) < 1 and abs(a(2) - g(2) + k  - my.z) < 1 then
-	 				ret = true
-	 				return ret
-	 			end if
-	 		end if
-	 	next i
-	 next j
-	next k
-
-	return ret
-}
-
-function is_float() as Boolean{
-	dim i as Integer
-	dim j as Integer
-	dim k as Integer
-	dim a(3) as Integer
-	dim x(3) as Double
-	dim g(3) as Integer
-	dim ret as Boolean
-
-	x(0) = my.X
-	x(1) = my.Y
-	x(2) = my.Z
-
-	for i = 0 to 2
-		a(i) = close_num(x(i))
-	next i
-
-	ret = false
-	for i = 0 to 2
-		if a(i) == 0 then
-			g(i) = 0
-		else
-			g(i) = 1
-		end if
-	next i
-
-	if x(0) == 0 or x(1) == 0 or x(2) == 0 then
-		ret = false
-		return ret
-	end if
-	
-	for k = 0 to (1 + g(2))
-	 for j = 0 to (1 + g(1))
-	 	for i = 0 to (1 + g(0))
-	 		if check_void(a(0)-g(0)+i,a(1)-g(1)+j,a(2)-g(2)+k) == 1 then
-	 			if abs(a(0) - g(0) + i  - my.X) > 1 and abs(a(1) - g(1) + j  - my.y) > 1 and abs(a(2) - g(2) + k  - my.z) > 1 then
-	 				ret = true
-	 				return ret
-	 			end if
-	 		end if
-	 	next i
-	 next j
-	next k
-
-	return ret
-}
-
-sub back_step(){
-	dim n(3) as Integer
-	dim diff_x as Double
-	dim diff_y as Double
-	dim diff_z as Double
-	dim pre(3) as Double
-	dim u(3) as Double
-	dim k(3) as Double
-	dim pre_n(3) as Double
-	dim i as Integer
-	dim ak(3) as Double 
-
-	pre(0) = GetHistory(my.X,1)
-	pre(1) = GetHistory(my.y,1)
-	pre(2) = GetHistory(my.z,1)
-
-	k(0) = 0
-	k(1) = 0
-	k(2) = 0
-
-	u(0) = my.forward_vector(0)//my.X - pre_x
-	u(1) = my.forward_vector(1)//my.y - pre_y
-	u(2) = my.forward_vector(2)//my.z - pre_z
-
-	n(0) = Int(my.X)
-	n(1) = Int(my.Y)
-	n(2) = Int(my.Z)
-
-	pre_n(0) = Int(pre(0))
-	pre_n(1) = Int(pre(1))
-	pre_n(2) = Int(pre(2))
-
-	for i = 0 to 2
-		if n(i) == pre_n(i) or u(i) == 0 then
-			k(i) = 0
-		else
-			if n(i) > pre_n(i) then
-				k(i) = (n(i) - pre(i)) / u(i)
-			else
-				k(i) = (pre_n(i) - pre(i)) / u(i)
-			end if
-		end if
-		ak(i) = Abs(k(i))
-		if k(i) < 0 then
-			k(i) = 0
-		end if
-	next i
-
-	if ak(0) <= ak(1) and ak(1) <= ak(2) then
-		my.X = pre(0) + k(2) * u(0)
-		my.y = pre(1) + k(2) * u(1)
-		my.z = pre(2) + k(2) * u(2)
-		back_0()
-		
-		if not is_step() then
-			my.X = pre(0) + k(1) * u(0)
-			my.y = pre(1) + k(1) * u(1)
-			my.z = pre(2) + k(1) * u(2)
-			back_0()
-
-			if not is_step() then
-				my.X = pre(0) + k(0) * u(0)
-				my.y = pre(1) + k(0) * u(1)
-				my.z = pre(2) + k(0) * u(2)
-				back_0()
-			end if
-		end if
-	elseif ak(0) <= ak(2) and ak(2) <= ak(1) then
-		my.X = pre(0) + k(1) * u(0)
-		my.y = pre(1) + k(1) * u(1)
-		my.z = pre(2) + k(1) * u(2)
-		back_0()
-
-		if not is_step() then
-			my.X = pre(0) + k(2) * u(0)
-			my.y = pre(1) + k(2) * u(1)
-			my.z = pre(2) + k(2) * u(2)
-			back_0()
-
-			if not is_step() then
-				my.X = pre(0) + k(0) * u(0)
-				my.y = pre(1) + k(0) * u(1)
-				my.z = pre(2) + k(0) * u(2)
-				back_0()
-			end if
-		end if
-	elseif ak(1) <= ak(0) and k(0) <= ak(2) then
-		my.X = pre(0) + k(2) * u(0)
-		my.y = pre(1) + k(2) * u(1)
-		my.z = pre(2) + k(2) * u(2)
-		back_0()
-
-		if not is_step() then
-			my.X = pre(0) + k(0) * u(0)
-			my.y = pre(1) + k(0) * u(1)
-			my.z = pre(2) + k(0) * u(2)
-			back_0()
-
-			if not is_step() then
-				my.X = pre(0) + k(1) * u(0)
-				my.y = pre(1) + k(1) * u(1)
-				my.z = pre(2) + k(1) * u(2)
-				back_0()
-			end if
-		end if
-	elseif ak(1) <= ak(2) and k(2) <= ak(0) then
-		my.X = pre(0) + k(0) * u(0)
-		my.y = pre(1) + k(0) * u(1)
-		my.z = pre(2) + k(0) * u(2)
-		back_0()
-
-		if not is_step() then
-			my.X = pre(0) + k(2) * u(0)
-			my.y = pre(1) + k(2) * u(1)
-			my.z = pre(2) + k(2) * u(2)
-			back_0()
-
-			if not is_step() then
-				my.X = pre(0) + k(1) * u(0)
-				my.y = pre(1) + k(1) * u(1)
-				my.z = pre(2) + k(1) * u(2)
-				back_0()
-			end if
-		end if
-	elseif ak(2) <= ak(0) and k(0) <= ak(1) then
-		my.X = pre(0) + k(1) * u(0)
-		my.y = pre(1) + k(1) * u(1)
-		my.z = pre(2) + k(1) * u(2)
-		back_0()
-
-		if not is_step() then
-			my.X = pre(0) + k(0) * u(0)
-			my.y = pre(1) + k(0) * u(1)
-			my.z = pre(2) + k(0) * u(2)
-			back_0()
-
-			if not is_step() then
-				my.X = pre(0) + k(2) * u(0)
-				my.y = pre(1) + k(2) * u(1)
-				my.z = pre(2) + k(2) * u(2)
-				back_0()
-			end if
-		end if
-	else			
-		my.X = pre(0) + k(0) * u(0)
-		my.y = pre(1) + k(0) * u(1)
-		my.z = pre(2) + k(0) * u(2)
-		back_0()
-
-		if not is_step() then
-			my.X = pre(0) + k(1) * u(0)
-			my.y = pre(1) + k(1) * u(1)
-			my.z = pre(2) + k(1) * u(2)
-			back_0()
-
-			if not is_step() then
-				my.X = pre(0) + k(2) * u(0)
-				my.y = pre(1) + k(2) * u(1)
-				my.z = pre(2) + k(2) * u(2)
-				back_0()
-			end if
-		end if
-	end if
-}
-
-sub back_0(){
-	if my.X < 0 then
-		my.X = 0
-	end if
-	if my.Y < 0 then
-		my.Y = 0
-	end if
-	if my.Z < 0 then
-		my.Z = 0
-	end if
-}
-
-
 sub determining_bend(){
 	dim degree as double
 	dim sum as Integer
