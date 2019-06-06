@@ -46,6 +46,7 @@ UNIVERSE {
             Dim vector_cul(0, 0)[2] As Double = (2*0.0);
             Dim state(0, 0) As Integer = (0);
             Dim stop_time(0, 0) As Integer = (0);
+            Dim time_of_randomwalk(0, 0) As Integer = ();
         }
         AgtType barrier(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
@@ -544,6 +545,55 @@ sub do_peripheral(){
 //周辺部でどう動くか
 }
 
+sub decide_direction_and_distance(){
+/*
+ランダムウォークで次に進む方向とその距離を決定する
+*/
+	my.Direction = rnd() * 360
+	if my.normal_vector(0) != 0 then
+		my.forward_vector(1) = Cos(DegreeToRad(my.Direction))
+		my.forward_vector(2) = Sin(DegreeToRad(my.Direction))
+	elseif my.normal_vector(1) != 0 then
+		my.forward_vector(0) = Cos(DegreeToRad(my.Direction))
+		my.forward_vector(2) = Sin(DegreeToRad(my.Direction))
+	elseif my.normal_vector(2) != 0 then
+		my.forward_vector(0) = Cos(DegreeToRad(my.Direction))
+		my.forward_vector(1) = Sin(DegreeToRad(my.Direction))
+	else
+		println("miss")
+	end if
+
+	my.time_of_randomwalk = Create_steps_of_random_walk()
+	
+}
+
+function Create_steps_of_random_walk()as Integer{
+/*
+	何ステップの間だけランダムウォークをするのかを返す
+*/
+
+}
+
+function in_central() as Boolean{
+	dim ret as Boolean
+	/*
+	どこかが壁に接していたらtrue,どこも接していなければfalse
+	*/
+	ret = false
+	return ret
+}
+
+function is_touch_new_surface()as Boolean{
+	dim ret as Boolean
+/*
+新しい面に触れていたらtrue,振れていなければfalseを返す
+*/
+	ret = false
+	return ret
+}
+
+//---------------------------------ここから下はコーディング済み--------------------------------------------
+
 sub do_stop() {
 //停止状態でどう動くか
 	if my.stop_time > 0 then
@@ -578,32 +628,6 @@ sub forward_one_step(){
 		back_step()
 	end if
 }
-
-sub decide_direction_and_distance(){
-/*
-ランダムウォークで次に進む方向とその距離を決定する
-*/
-}
-
-function in_central() as Boolean{
-	dim ret as Boolean
-	/*
-	どこかが壁に接していたらtrue,どこも接していなければfalse
-	*/
-	ret = false
-	return ret
-}
-
-function is_touch_new_surface()as Boolean{
-	dim ret as Boolean
-/*
-新しい面に触れていたらtrue,振れていなければfalseを返す
-*/
-	ret = false
-	return ret
-}
-
-//---------------------------------ここから下はコーディング済み--------------------------------------------
 
 sub stop_insect(){
 /*
@@ -654,7 +678,7 @@ function is_stop_central() as Boolean{
 	dim ret as Boolean
 	dim thread as Double
 
-	thread = 0.97 ^(1/10)
+	thread = universe.probability_stop_center
 
 	if Rnd() < thread then
 		ret = false
@@ -3874,17 +3898,19 @@ Model_Description {
         }
         Function do_peripheral {
         }
+        Function decide_direction_and_distance {
+        }
+        Function Create_steps_of_random_walk {
+        }
+        Function in_central {
+        }
+        Function is_touch_new_surface {
+        }
         Function do_stop {
         }
         Function do_central {
         }
         Function forward_one_step {
-        }
-        Function decide_direction_and_distance {
-        }
-        Function in_central {
-        }
-        Function is_touch_new_surface {
         }
         Function stop_insect {
         }
