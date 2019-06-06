@@ -68,6 +68,8 @@ UNIVERSE {
     Dim alpha(0, 0) As Double = (0.0);
     Dim rubble_rate(0, 0) As Double = (0.0);
     Dim T_ex(0, 0) As Integer = (0);
+    Dim probability_stop_center(0, 0) As Double = ();
+    Dim probability_continue_periphery(0, 0) As Double = ();
 }
 
 
@@ -87,6 +89,8 @@ Initial_Value {
 //-------------------------------------------------------
 #begin_rule UNIVERSE
 Univ_Init{
+	universe.probability_stop_center = 1 - 0.97 ^ (1/10)
+	universe.probability_continue_periphery = 0.8 ^ (1/10)
 	CreateAgtMulti(universe.map.insect,universe.num_insect)
 	ClearConsoleScreen()
 	//make_rubble_mix(0.6)
@@ -614,6 +618,8 @@ function is_touch_new_surface()as Boolean{
 	ret = false
 	return ret
 }
+
+//---------------------------------ここから下はコーディング済み--------------------------------------------
 
 sub step_direction(){
 /*
@@ -3770,7 +3776,7 @@ Space_Map_Initial_Value {
 Window_Rectangle {
     Window_Name = Main_Window, -10, 0, 980, 1030;
     Window_Name = Output_Setting_Window, 743, 353, 480, 350;
-    Window_Name = Artisoc_Help_Window, 10, 10, 400, 300;
+    Window_Name = Artisoc_Help_Window, 10, 10, 791, 491;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
     Window_Name = Space_3D_Setting_Window, 746, 251, 450, 540;
 }
