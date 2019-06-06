@@ -594,6 +594,16 @@ function in_central() as Boolean{
 	return ret
 }
 
+function is_touch_new_surface()as Boolean{
+	dim ret as Boolean
+/*
+新しい面に触れていたらtrue,振れていなければfalseを返す
+*/
+	ret = false
+	return ret
+}
+
+//---------------------------------ここから下はコーディング済み--------------------------------------------
 
 sub stop_insect(){
 /*
@@ -616,10 +626,12 @@ function Create_stop_time() as Integer{
 	func = 0
 	prob = 0
 	Do Until prob < func
-	steps = Int(Rnd() * 10000)
+	steps = Int(Rnd() * 10000) + 1
 	prob = Rnd()
+	
+	func = distribution_stop_time(steps)
 	Loop
-
+	return steps
 }
 
 function distribution_stop_time(steps as Integer) as Double{
@@ -630,21 +642,11 @@ function distribution_stop_time(steps as Integer) as Double{
 	dim ret as Double
 	
 	time = steps * 10
-	ret = 0.93 * Exp(-t / 5.87) + 0.07 * Exp(-t / 700)
+	ret = 0.93 * Exp(-time / 5.87) + 0.07 * Exp(-time / 700)
 
 	return ret
 }
 
-function is_touch_new_surface()as Boolean{
-	dim ret as Boolean
-/*
-新しい面に触れていたらtrue,振れていなければfalseを返す
-*/
-	ret = false
-	return ret
-}
-
-//---------------------------------ここから下はコーディング済み--------------------------------------------
 function is_stop_central() as Boolean{
 	/*
 	中央部において止まるかどうか。止まるならtrue,止まらないならfalseを返す
@@ -3882,13 +3884,13 @@ Model_Description {
         }
         Function in_central {
         }
+        Function is_touch_new_surface {
+        }
         Function stop_insect {
         }
         Function Create_stop_time {
         }
         Function distribution_stop_time {
-        }
-        Function is_touch_new_surface {
         }
         Function is_stop_central {
         }
