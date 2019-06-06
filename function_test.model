@@ -12,6 +12,7 @@ Version = 4.2;
 // Component Tree
 //-------------------------------------------------------
 UNIVERSE {
+    Dim steps(0, 0)[100000] As Integer = ();
 }
 
 
@@ -27,7 +28,7 @@ Initial_Value {
 //-------------------------------------------------------
 #begin_rule UNIVERSE
 Univ_Init{
-
+ClearConsoleScreen()
 }
 
 Univ_Step_Begin{
@@ -35,11 +36,49 @@ Univ_Step_Begin{
 }
 
 Univ_Step_End{
-
+	dim steps as Integer
+	steps = GetCountStep()
+	universe.steps(steps) = Create_stop_time()
+	if (steps mod 1000) == 0 then
+		PrintLn(steps)
+	end if
 }
 
 Univ_Finish{
 
+}
+
+function Create_stop_time() as Integer{
+/*
+ï™ïzÇ…è]Ç¡ÇΩí‚é~éûä‘Çï‘Ç∑
+*/
+	dim func as Double
+	dim steps as Integer
+	dim prob as Double
+
+	steps = 0
+	func = 0
+	prob = 0
+	Do Until prob < func
+	steps = Int(Rnd() * 10000)
+	prob = Rnd()
+	
+	func = distribution_stop_time(steps)
+	Loop
+	return steps
+}
+
+function distribution_stop_time(steps as Integer) as Double{
+/*
+í‚é~éûä‘ÇÃï™ïzä÷êî
+*/
+	dim time as Double
+	dim ret as Double
+	
+	time = steps * 10
+	ret = 0.93 * Exp(-time / 5.87) + 0.07 * Exp(-time / 700)
+
+	return ret
 }
 #end_rule UNIVERSE
 
@@ -50,11 +89,11 @@ Univ_Finish{
 // Simulation Definition Division
 //-------------------------------------------------------
 Single_Simulation {
-    Step_Max = 0;
+    Step_Max = 100000;
     Time_Max = 0;
     End_Condition = "";
     Exec_Wait = 1;
-    Exec_Wait_Max = 0;
+    Exec_Wait_Max = 1000;
     Random_Generator = Java_Standard;
     Exec_Order = Random;
     Exec_Order_Random_First_Step_Only = No;
@@ -77,10 +116,45 @@ Repeat_Simulation {
 
 
 //-------------------------------------------------------
+//  Histogram Output Definition Division
+//-------------------------------------------------------
+Histogram {
+    Font_Name = "Dialog";
+    Font_Char_Set = 81;
+    Font_Size = 12.0;
+    Font_Style = 0;
+    Font_Color = 0, 0, 0;
+    Font_Background_Color = 255, 255, 255;
+    Graph_Name = "a";
+    Title = "a";
+    Disable = No;
+    Background_Color = 255, 255, 255;
+    Remarks = Yes;
+    Legend_Pos = Top;
+    FastDraw = Yes;
+    Position_x = 100;
+    Position_y = 100;
+    Size_x = 500;
+    Size_y = 300;
+    Map_Cell_Size = -1;
+    Axis_Label = "a", "a";
+    Output_Group_Name = "";
+    Output {
+        Graph_Element_Name = "aaa";
+        Line_Color = 0, 0, 0;
+        The_Number_Of_Datas = "100000";
+        The_Number_Of_Sections = "1000";
+        Variable_Id_Y_Axis = Universe.steps;
+        Graph_Element_Color = ;
+    }
+}
+
+
+//-------------------------------------------------------
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 0, 0, 100, 100;
+    Display_Area = 0, 0, 166, 57;
     Display_Type = 0;
 }
 
@@ -107,7 +181,7 @@ Others_Data {
     Console_Position_x = 2;
     Console_Position_y = 400;
     Console_Size_x = 600;
-    Console_Size_y = 120;
+    Console_Size_y = 506;
     Componen_Tree_Position_x = 2;
     Componen_Tree_Position_y = 2;
     Componen_Tree_Size_x = 250;
@@ -139,7 +213,8 @@ Network_Info {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -8, 0, 1296, 1398;
+    Window_Name = Main_Window, 1272, 0, 1296, 1398;
+    Window_Name = Output_Setting_Window, 423, 524, 480, 350;
     Window_Name = Artisoc_Help_Window, 10, 10, 400, 300;
 }
 
@@ -163,6 +238,10 @@ Model_Description {
         Function Univ_Step_End {
         }
         Function Univ_Finish {
+        }
+        Function Create_stop_time {
+        }
+        Function distribution_stop_time {
         }
     }
 }

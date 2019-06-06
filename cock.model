@@ -4,7 +4,7 @@
 //                                                                    /
 //====================================================================/
 
-Version = 4.0;
+Version = 4.2;
 
 
 
@@ -44,8 +44,8 @@ UNIVERSE {
             Dim edge_flag(0, 0) As Boolean = (0);
             Dim T_al(0, 0) As Integer = (0);
             Dim vector_cul(0, 0)[2] As Double = (2*0.0);
-            Dim state(0, 0) As Integer = ();
-            Dim stop_time(0, 0) As Integer = ();
+            Dim state(0, 0) As Integer = (0);
+            Dim stop_time(0, 0) As Integer = (0);
         }
         AgtType barrier(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
@@ -68,8 +68,8 @@ UNIVERSE {
     Dim alpha(0, 0) As Double = (0.0);
     Dim rubble_rate(0, 0) As Double = (0.0);
     Dim T_ex(0, 0) As Integer = (0);
-    Dim probability_stop_center(0, 0) As Double = ();
-    Dim probability_continue_periphery(0, 0) As Double = ();
+    Dim probability_stop_center(0, 0) As Double = (0.0);
+    Dim probability_continue_periphery(0, 0) As Double = (0.0);
 }
 
 
@@ -517,7 +517,7 @@ my.X = 1 + rnd() *0.5
 my.Y = 1 + rnd() *0.5
 my.Z = 0
 my.T_al = Int(Rnd()*10)
-my.state = 0
+my.state = 1
 }
 
 Agt_Step{
@@ -594,20 +594,45 @@ function in_central() as Boolean{
 	return ret
 }
 
-function is_stop_central() as Boolean{
-	dim ret as Boolean
-	/*
-	’†‰›•”‚É‚¨‚¢‚Ä~‚Ü‚é‚©‚Ç‚¤‚©B~‚Ü‚é‚È‚çtrue,~‚Ü‚ç‚È‚¢‚È‚çfalse‚ğ•Ô‚·
-	*/
-	ret = false
-	return ret
-}
 
 sub stop_insect(){
 /*
 1.’â~ŠÔ‚ğİ’è
 2.’â~ó‘Ô‚É‚È‚é
 */
+	my.stop_time = Create_stop_time()
+	my.state = 0
+}
+
+function Create_stop_time() as Integer{
+/*
+•ª•z‚É]‚Á‚½’â~ŠÔ‚ğ•Ô‚·
+*/
+	dim func as Double
+	dim steps as Integer
+	dim prob as Double
+
+	steps = 0
+	func = 0
+	prob = 0
+	Do Until prob < func
+	steps = Int(Rnd() * 10000)
+	prob = Rnd()
+	Loop
+
+}
+
+function distribution_stop_time(steps as Integer) as Double{
+/*
+’â~ŠÔ‚Ì•ª•zŠÖ”
+*/
+	dim time as Double
+	dim ret as Double
+	
+	time = steps * 10
+	ret = 0.93 * Exp(-t / 5.87) + 0.07 * Exp(-t / 700)
+
+	return ret
 }
 
 function is_touch_new_surface()as Boolean{
@@ -620,6 +645,23 @@ function is_touch_new_surface()as Boolean{
 }
 
 //---------------------------------‚±‚±‚©‚ç‰º‚ÍƒR[ƒfƒBƒ“ƒOÏ‚İ--------------------------------------------
+function is_stop_central() as Boolean{
+	/*
+	’†‰›•”‚É‚¨‚¢‚Ä~‚Ü‚é‚©‚Ç‚¤‚©B~‚Ü‚é‚È‚çtrue,~‚Ü‚ç‚È‚¢‚È‚çfalse‚ğ•Ô‚·
+	*/
+	dim ret as Boolean
+	dim thread as Double
+
+	thread = 0.97 ^(1/10)
+
+	if Rnd() < thread then
+		ret = false
+	else
+		ret = true
+	end if
+	
+	return ret
+}
 
 sub step_direction(){
 /*
@@ -3650,7 +3692,7 @@ Time_Graph {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 0, 0, 420, 116;
+    Display_Area = 0, 0, 416, 107;
     Display_Type = 1;
     Panel_Item {
         Item_Type = Edit_Box;
@@ -3774,9 +3816,9 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -10, 0, 980, 1030;
-    Window_Name = Output_Setting_Window, 743, 353, 480, 350;
-    Window_Name = Artisoc_Help_Window, 10, 10, 791, 491;
+    Window_Name = Main_Window, -8, 0, 1296, 1398;
+    Window_Name = Output_Setting_Window, 423, 524, 480, 350;
+    Window_Name = Artisoc_Help_Window, 10, 10, 970, 469;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
     Window_Name = Space_3D_Setting_Window, 746, 251, 450, 540;
 }
@@ -3786,4 +3828,99 @@ Window_Rectangle {
 // Help Favorite Division
 //-------------------------------------------------------
 Help_Favorite {
+}
+
+
+//-------------------------------------------------------
+// Model Description Division
+//-------------------------------------------------------
+Model_Description {
+    Universe {
+        Function Univ_Init {
+        }
+        Function read_barrier {
+        }
+        Function write_parameter {
+        }
+        Function make_void {
+        }
+        Function Univ_Step_Begin {
+        }
+        Function Univ_Step_End {
+        }
+        Function write_csv {
+        }
+        Function Univ_Finish {
+        }
+        Function make_rubble_mix {
+        }
+        Function make_rubble_board {
+        }
+        Function make_rubble_box {
+        }
+        Function make_rubble_Pillar {
+        }
+    }
+    Space Universe.map {
+    }
+    Agent Universe.map.insect {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+        Function move_new_surface {
+        }
+        Function do_peripheral {
+        }
+        Function do_stop {
+        }
+        Function do_central {
+        }
+        Function forward_one_step {
+        }
+        Function decide_direction_and_distance {
+        }
+        Function in_central {
+        }
+        Function stop_insect {
+        }
+        Function Create_stop_time {
+        }
+        Function distribution_stop_time {
+        }
+        Function is_touch_new_surface {
+        }
+        Function is_stop_central {
+        }
+        Function step_direction {
+        }
+        Function delete_touch_vector {
+        }
+        Function update_normal {
+        }
+        Function is_step {
+        }
+        Function is_filled {
+        }
+        Function is_float {
+        }
+        Function back_step {
+        }
+        Function back_0 {
+        }
+        Function is_pause {
+        }
+        Function is_jump {
+        }
+        Function close_num {
+        }
+        Function check_void {
+        }
+    }
+    Agent Universe.map.barrier {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+    }
 }
