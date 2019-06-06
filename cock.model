@@ -545,6 +545,26 @@ sub do_peripheral(){
 //周辺部でどう動くか
 }
 
+function in_central() as Boolean{
+	dim ret as Boolean
+	/*
+	どこかが壁に接していたらtrue,どこも接していなければfalse
+	*/
+	ret = false
+	return ret
+}
+
+function is_touch_new_surface()as Boolean{
+	dim ret as Boolean
+/*
+新しい面に触れていたらtrue,振れていなければfalseを返す
+*/
+	ret = false
+	return ret
+}
+
+//---------------------------------ここから下はコーディング済み--------------------------------------------
+
 sub decide_direction_and_distance(){
 /*
 ランダムウォークで次に進む方向とその距離を決定する
@@ -571,28 +591,37 @@ function Create_steps_of_random_walk()as Integer{
 /*
 	何ステップの間だけランダムウォークをするのかを返す
 */
+	dim func as Double
+	dim steps as Integer
+	dim prob as Double
 
+	steps = 0
+	func = 0
+	prob = 0
+	Do Until prob < func
+		steps = Int(Rnd() * 1000)
+		prob = Rnd()
+	
+		func = distribution_time_of_random_walk(steps)
+	Loop
+	
+	return steps
 }
 
-function in_central() as Boolean{
-	dim ret as Boolean
-	/*
-	どこかが壁に接していたらtrue,どこも接していなければfalse
-	*/
-	ret = false
+function distribution_time_of_random_walk(steps as Integer) as Double{
+	dim mean as Double
+	dim ramda as Double
+	dim ret as Double
+	dim distance as Double
+
+	distance = steps * 6
+	mean = 12.32 //ここの平均を考え直すべき
+	ramda = 1 / mean
+
+	ret = ramda * Exp(-1 * ramda * distance)
+
 	return ret
 }
-
-function is_touch_new_surface()as Boolean{
-	dim ret as Boolean
-/*
-新しい面に触れていたらtrue,振れていなければfalseを返す
-*/
-	ret = false
-	return ret
-}
-
-//---------------------------------ここから下はコーディング済み--------------------------------------------
 
 sub do_stop() {
 //停止状態でどう動くか
@@ -3898,13 +3927,15 @@ Model_Description {
         }
         Function do_peripheral {
         }
+        Function in_central {
+        }
+        Function is_touch_new_surface {
+        }
         Function decide_direction_and_distance {
         }
         Function Create_steps_of_random_walk {
         }
-        Function in_central {
-        }
-        Function is_touch_new_surface {
+        Function distribution_time_of_random_walk {
         }
         Function do_stop {
         }
