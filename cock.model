@@ -46,7 +46,7 @@ UNIVERSE {
             Dim vector_cul(0, 0)[2] As Double = (2*0.0);
             Dim state(0, 0) As Integer = (0);
             Dim stop_time(0, 0) As Integer = (0);
-            Dim time_of_randomwalk(0, 0) As Integer = ();
+            Dim time_of_randomwalk(0, 0) As Integer = (0);
         }
         AgtType barrier(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
@@ -545,15 +545,6 @@ sub do_peripheral(){
 //Žü•Ó•”‚Å‚Ç‚¤“®‚­‚©
 }
 
-function in_central() as Boolean{
-	dim ret as Boolean
-	/*
-	‚Ç‚±‚©‚ª•Ç‚ÉÚ‚µ‚Ä‚¢‚½‚çtrue,‚Ç‚±‚àÚ‚µ‚Ä‚¢‚È‚¯‚ê‚Îfalse
-	*/
-	ret = false
-	return ret
-}
-
 function is_touch_new_surface()as Boolean{
 	dim ret as Boolean
 /*
@@ -564,6 +555,30 @@ function is_touch_new_surface()as Boolean{
 }
 
 //---------------------------------‚±‚±‚©‚ç‰º‚ÍƒR[ƒfƒBƒ“ƒOÏ‚Ý--------------------------------------------
+
+function in_central() as Boolean{
+	/*
+	‚Ç‚±‚©‚ª•Ç‚ÉÚ‚µ‚Ä‚¢‚½‚çtrue,‚Ç‚±‚àÚ‚µ‚Ä‚¢‚È‚¯‚ê‚Îfalse
+	touch‚ªŽ©•ª‚Ì‰ºˆÈŠO‚ÉG‚ê‚Ä‚¢‚½‚ç•Ç‚ÉG‚ê‚Ä‚¢‚é‚Æ”»’f
+	*/
+	dim ret as Boolean
+	dim count as Integer
+
+	count = 0
+	for i = 0 to 2
+		if my.touch(i) != 0 then
+			count = count + 1
+		end if
+	next i
+
+	if count > 1 then
+		ret = true
+	else
+		ret = false
+	end if
+	
+	return ret
+}
 
 sub decide_direction_and_distance(){
 /*
@@ -3747,7 +3762,7 @@ Time_Graph {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 0, 0, 416, 107;
+    Display_Area = 0, 0, 404, 95;
     Display_Type = 1;
     Panel_Item {
         Item_Type = Edit_Box;
@@ -3927,9 +3942,9 @@ Model_Description {
         }
         Function do_peripheral {
         }
-        Function in_central {
-        }
         Function is_touch_new_surface {
+        }
+        Function in_central {
         }
         Function decide_direction_and_distance {
         }
