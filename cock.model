@@ -4,7 +4,7 @@
 //                                                                    /
 //====================================================================/
 
-Version = 4.2;
+Version = 4.0;
 
 
 
@@ -543,6 +543,27 @@ sub move_new_surface(){
 
 sub do_peripheral(){
 //Žü•Ó•”‚Å‚Ç‚¤“®‚­‚©
+	if is_stop_do_peripheral() then
+		if Rnd() < 2/3 then //Žü•Ó•”‚ÅŽ~‚Ü‚é‚©A’†‰›•”‚É“ü‚é‚©
+			invade_central_zone()			
+		else
+			stop_insect()
+		end if
+	else
+		//•Ç‚É‰ˆ‚¤•ûŒü‚ðŒˆ’è‚µA‚»‚Ì•ûŒü‚Éi‚Þ
+	end if
+}
+
+sub invade_central_zone(){
+}
+
+function is_stop_do_peripheral(){
+	dim ret as Boolean
+/*
+Žü•Ó‚Ì“®ì‚ð‚â‚ß‚é‚È‚çtrue,‚»‚Ì‚Ü‚Ü‘±‚¯‚é‚È‚çfalse‚ð•Ô‚·
+*/
+	ret = false
+	return ret
 }
 
 function is_touch_new_surface()as Boolean{
@@ -3762,7 +3783,7 @@ Time_Graph {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 0, 0, 404, 95;
+    Display_Area = 0, 0, 420, 116;
     Display_Type = 1;
     Panel_Item {
         Item_Type = Edit_Box;
@@ -3886,7 +3907,7 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -8, 0, 1296, 1398;
+    Window_Name = Main_Window, -10, 0, 980, 1030;
     Window_Name = Output_Setting_Window, 423, 524, 480, 350;
     Window_Name = Artisoc_Help_Window, 10, 10, 970, 469;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
@@ -3898,103 +3919,4 @@ Window_Rectangle {
 // Help Favorite Division
 //-------------------------------------------------------
 Help_Favorite {
-}
-
-
-//-------------------------------------------------------
-// Model Description Division
-//-------------------------------------------------------
-Model_Description {
-    Universe {
-        Function Univ_Init {
-        }
-        Function read_barrier {
-        }
-        Function write_parameter {
-        }
-        Function make_void {
-        }
-        Function Univ_Step_Begin {
-        }
-        Function Univ_Step_End {
-        }
-        Function write_csv {
-        }
-        Function Univ_Finish {
-        }
-        Function make_rubble_mix {
-        }
-        Function make_rubble_board {
-        }
-        Function make_rubble_box {
-        }
-        Function make_rubble_Pillar {
-        }
-    }
-    Space Universe.map {
-    }
-    Agent Universe.map.insect {
-        Function Agt_Init {
-        }
-        Function Agt_Step {
-        }
-        Function move_new_surface {
-        }
-        Function do_peripheral {
-        }
-        Function is_touch_new_surface {
-        }
-        Function in_central {
-        }
-        Function decide_direction_and_distance {
-        }
-        Function Create_steps_of_random_walk {
-        }
-        Function distribution_time_of_random_walk {
-        }
-        Function do_stop {
-        }
-        Function do_central {
-        }
-        Function forward_one_step {
-        }
-        Function stop_insect {
-        }
-        Function Create_stop_time {
-        }
-        Function distribution_stop_time {
-        }
-        Function is_stop_central {
-        }
-        Function step_direction {
-        }
-        Function delete_touch_vector {
-        }
-        Function update_normal {
-        }
-        Function is_step {
-        }
-        Function is_filled {
-        }
-        Function is_float {
-        }
-        Function back_step {
-        }
-        Function back_0 {
-        }
-        Function is_pause {
-        }
-        Function is_jump {
-        }
-        Function close_num {
-        }
-        Function check_void {
-        }
-    }
-    Agent Universe.map.barrier {
-        Function Agt_Init {
-        }
-        Function Agt_Step {
-        }
-    }
 }
