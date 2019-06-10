@@ -557,6 +557,17 @@ sub do_peripheral(){
 sub invade_central_zone(){
 }
 
+function is_touch_new_surface()as Boolean{
+	dim ret as Boolean
+/*
+新しい面に触れていたらtrue,振れていなければfalseを返す
+*/
+	ret = false
+	return ret
+}
+
+//---------------------------------ここから下はコーディング済み--------------------------------------------
+
 function is_stop_do_peripheral(){
 /*
 周辺の動作をやめるならtrue,そのまま続けるならfalseを返す
@@ -569,17 +580,6 @@ function is_stop_do_peripheral(){
 		ret = true
 	return ret
 }
-
-function is_touch_new_surface()as Boolean{
-	dim ret as Boolean
-/*
-新しい面に触れていたらtrue,振れていなければfalseを返す
-*/
-	ret = false
-	return ret
-}
-
-//---------------------------------ここから下はコーディング済み--------------------------------------------
 
 function in_central() as Boolean{
 	/*
