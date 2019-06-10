@@ -558,11 +558,15 @@ sub invade_central_zone(){
 }
 
 function is_stop_do_peripheral(){
-	dim ret as Boolean
 /*
 ü•Ó‚Ì“®ì‚ğ‚â‚ß‚é‚È‚çtrue,‚»‚Ì‚Ü‚Ü‘±‚¯‚é‚È‚çfalse‚ğ•Ô‚·
 */
-	ret = false
+	dim ret as Boolean
+
+	if Rnd() < universe.probability_continue_periphery then
+		ret = false
+	else
+		ret = true
 	return ret
 }
 
