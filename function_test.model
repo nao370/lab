@@ -37,15 +37,56 @@ Univ_Step_Begin{
 
 Univ_Step_End{
 	dim steps as Integer
+
 	steps = GetCountStep()
-	universe.steps(steps - 1) = Create_steps_of_random_walk()
-	if (steps mod 1000) == 0 then
-		PrintLn(steps)
-	end if
+	universe.steps(steps - 1) = angle_invade()
+//		PrintLn(angle_invade())
 }
 
 Univ_Finish{
 
+}
+
+function angle_invade() as Double{
+/*
+‘Î”•ª•z‚É]‚Á‚Ä5~175‚Å•Ô‚·
+*/
+	dim func as Double
+	dim angle as Double
+	dim prob as Double
+	dim mean as Double
+	dim SD as Double
+
+	mean = 36.6
+	SD =  2.14 
+	angle = 0
+	func = 0
+	prob = 0
+/*	Do Until prob < func
+		angle = Rnd() * 170 + 5
+		prob = Rnd()
+	
+		func = func_log_normal(angle)
+	Loop*/
+
+	angle = mean + SD * Sqr(-2 * Log(Rnd())) * Sin(2 * PI() *  Rnd())
+
+	//return angle
+	return angle
+}
+
+function func_log_normal(angle as Double) as Double{
+
+	dim mean as Double
+	dim SD as Double
+	dim ret as Double
+
+	mean = 36.6
+	SD = 2.14
+
+	ret = (1 / ( Sqr(2 * PI()) * SD * angle )) * Exp( (-1 * (Log(angle) - mean)^2) / ( 2 * SD ^2 ) )
+
+	return ret
 }
 
 function Create_steps_of_random_walk()as Integer{
@@ -129,7 +170,7 @@ Single_Simulation {
     Step_Max = 100000;
     Time_Max = 0;
     End_Condition = "";
-    Exec_Wait = 1;
+    Exec_Wait = 0;
     Exec_Wait_Max = 1000;
     Random_Generator = Java_Standard;
     Exec_Order = Random;
@@ -171,16 +212,16 @@ Histogram {
     FastDraw = Yes;
     Position_x = 100;
     Position_y = 0;
-    Size_x = 932;
+    Size_x = 1178;
     Size_y = 615;
     Map_Cell_Size = -1;
     Axis_Label = "a", "a";
     Output_Group_Name = "";
     Output {
         Graph_Element_Name = "aaa";
-        Line_Color = 0, 0, 0;
+        Line_Color = 204, 102, 255;
         The_Number_Of_Datas = "100000";
-        The_Number_Of_Sections = "1000";
+        The_Number_Of_Sections = "175";
         Variable_Id_Y_Axis = Universe.steps;
         Graph_Element_Color = (0, 0, 0);
     }
@@ -275,6 +316,10 @@ Model_Description {
         Function Univ_Step_End {
         }
         Function Univ_Finish {
+        }
+        Function angle_invade {
+        }
+        Function func_log_normal {
         }
         Function Create_steps_of_random_walk {
         }

@@ -4,7 +4,7 @@
 //                                                                    /
 //====================================================================/
 
-Version = 4.0;
+Version = 4.2;
 
 
 
@@ -551,10 +551,15 @@ sub do_peripheral(){
 		end if
 	else
 		//壁に沿う方向を決定し、その方向に進む
+		along_wall()
+		step_direction()
 	end if
 }
 
-sub invade_central_zone(){
+sub along_wall(){
+/*
+壁に沿う動きにおいて、次の方向を決定する
+*/
 }
 
 function is_touch_new_surface()as Boolean{
@@ -567,6 +572,91 @@ function is_touch_new_surface()as Boolean{
 }
 
 //---------------------------------ここから下はコーディング済み--------------------------------------------
+
+sub invade_central_zone(){
+/*
+角度を決定し、一歩前進
+*/
+	decision_invade_angle()
+	step_direction()
+	
+}
+
+sub decision_invade_angle(){
+/*
+侵入する角度の決定
+*/
+	dim n as Integer
+	dim t as Integer
+	dim x as Double
+	dim y as Double
+	dim z as Double
+
+	x = my.forward_vector(0)
+	y = my.forward_vector(1)
+	z = my.forward_vector(2)
+	n = normal_num()
+	t = touch_signal(n)
+	theta = DegreeToRad(angle_invade()) * t
+
+	if n == 0 then
+		my.forward_vector(1) = Cos(theta) * y - Sin(theta) * z
+		my.forward_vector(2) = Sin(theta) * y + Cos(theta) * z
+	elseif n==1 then
+		my.forward_vector(0) = Cos(theta) * x - Sin(theta) * z
+		my.forward_vector(2) = Sin(theta) * x + Cos(theta) * z
+	else
+		my.forward_vector(0) = Cos(theta) * x - Sin(theta) * y
+		my.forward_vector(1) = Sin(theta) * x + Cos(theta) * y
+	end if
+	
+}
+
+function touch_signal(n as Integer) as Integer{
+
+	if my.touch(0) != 0 and n != 0 then
+		Return my.touch(0)
+	elseif my.touch(1) != 0 and n != 1 then
+		Return my.touch(1)
+	elseif my.touch(2) != 0 and n != 2 then
+		Return my.touch(2)
+	else
+		println("error in touch_angle()")
+		TerminateAgt()
+	end if
+}
+
+function angle_invade() as Double{
+/*
+対数分布に従って5~175で返す
+*/
+	dim angle as Double
+	dim mean as Double
+	dim SD as Double
+
+	mean = 36.6
+	SD =  2.14 
+
+	angle = mean + SD * Sqr(-2 * Log(Rnd())) * Sin(2 * PI() *  Rnd())
+	return angle
+}
+
+function normal_num()as Integer{
+/*
+現在どの面の上に乗っているかを返す
+xy平面　= 2     xz平面 = 1   yz平面 = 0
+*/
+	if My.normal_vector(0) != 0 then
+		return 0
+	elseif my.normal_vector(1) != 0 then
+		return 1
+	elseif my.normal_vector(2) != 0 then
+		return 2
+	else
+		println("error in normal_num()")
+		TerminateAgt(my)
+	end if
+}
 
 function is_stop_do_peripheral(){
 /*
@@ -3787,7 +3877,7 @@ Time_Graph {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 0, 0, 420, 116;
+    Display_Area = 0, 0, 416, 107;
     Display_Type = 1;
     Panel_Item {
         Item_Type = Edit_Box;
@@ -3911,7 +4001,7 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -10, 0, 980, 1030;
+    Window_Name = Main_Window, -8, 0, 1296, 1398;
     Window_Name = Output_Setting_Window, 423, 524, 480, 350;
     Window_Name = Artisoc_Help_Window, 10, 10, 970, 469;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
@@ -3923,4 +4013,117 @@ Window_Rectangle {
 // Help Favorite Division
 //-------------------------------------------------------
 Help_Favorite {
+}
+
+
+//-------------------------------------------------------
+// Model Description Division
+//-------------------------------------------------------
+Model_Description {
+    Universe {
+        Function Univ_Init {
+        }
+        Function read_barrier {
+        }
+        Function write_parameter {
+        }
+        Function make_void {
+        }
+        Function Univ_Step_Begin {
+        }
+        Function Univ_Step_End {
+        }
+        Function write_csv {
+        }
+        Function Univ_Finish {
+        }
+        Function make_rubble_mix {
+        }
+        Function make_rubble_board {
+        }
+        Function make_rubble_box {
+        }
+        Function make_rubble_Pillar {
+        }
+    }
+    Space Universe.map {
+    }
+    Agent Universe.map.insect {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+        Function move_new_surface {
+        }
+        Function do_peripheral {
+        }
+        Function along_wall {
+        }
+        Function is_touch_new_surface {
+        }
+        Function invade_central_zone {
+        }
+        Function decision_invade_angle {
+        }
+        Function touch_signal {
+        }
+        Function angle_invade {
+        }
+        Function normal_num {
+        }
+        Function is_stop_do_peripheral {
+        }
+        Function in_central {
+        }
+        Function decide_direction_and_distance {
+        }
+        Function Create_steps_of_random_walk {
+        }
+        Function distribution_time_of_random_walk {
+        }
+        Function do_stop {
+        }
+        Function do_central {
+        }
+        Function forward_one_step {
+        }
+        Function stop_insect {
+        }
+        Function Create_stop_time {
+        }
+        Function distribution_stop_time {
+        }
+        Function is_stop_central {
+        }
+        Function step_direction {
+        }
+        Function delete_touch_vector {
+        }
+        Function update_normal {
+        }
+        Function is_step {
+        }
+        Function is_filled {
+        }
+        Function is_float {
+        }
+        Function back_step {
+        }
+        Function back_0 {
+        }
+        Function is_pause {
+        }
+        Function is_jump {
+        }
+        Function close_num {
+        }
+        Function check_void {
+        }
+    }
+    Agent Universe.map.barrier {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+    }
 }
