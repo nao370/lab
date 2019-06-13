@@ -528,16 +528,21 @@ dim i as Integer
 	for i = 0 to 2
 		println("touch("&i&") : "&my.touch(i))
 	next i 
-
+	println("z is"&my.Z)
+	
 	if my.state == 0 then
+		print("do_stop")
 		do_stop()
 	else
 		if in_central() then
+				print("do_central")
 			do_central()
 		else
 			if is_touch_new_surface() then
+					println("move_surface")
 				move_new_surface()
 			else
+					print("do_peri")
 				do_peripheral()
 			end if
 		end if
@@ -570,18 +575,26 @@ sub move_new_surface(){
 	dim b as Integer
 	dim pre(3) as Integer
 	dim f(3) as Double
+println("----------------------------------------move_new_surface-------------------------------------")
+
+
+	for i = 0 to 2
+		pre(i) = my.pre_touch(i)
+		println("pre_touch("&i&") : "&my.pre_touch(i))
+	next i
 
 	for i = 0 to 2
 		if my.touch(i) != 0 and my.pre_touch(i) == 0 then
 			n = i
 		end if
 		my.pre_touch(i) = my.touch(i)
+		println("touch("&i&") : "&my.touch(i))
 	next i
 
 	b = get_boundary(n)
-
+	println("n = "&n&"  b = "&b)
+	
 		for i =0 to 2
-		pre(i) = GetHistory(my.touch(i),1)
 		f(i) = GetHistory(my.forward_vector(i),1)
 		if f(i) != 0 then
 			f(i) = f(i) / Abs(f(i))
@@ -597,6 +610,10 @@ sub move_new_surface(){
 			f(2) = 0
 		end if
 	end if
+
+	for i = 0 to 2
+		println("f("&i&") : "&f(i))
+	next i
 
 	if n == 0 then
 		my.X = my.X - pre(0)
@@ -630,6 +647,12 @@ sub update_touch() {
 	grid(1) = close_num(my.Y)
 	grid(2) = close_num(my.Z)
 
+	for i = 0 to 2
+		println("grid("&i&") is"&grid(i))
+	next i
+	println("forward(2) is "&my.forward_vector(2))
+	println("Z is"&my.Z)
+	
 	if grid(0) - 1 <= 1 then
 		my.touch(0) = 1
 	elseif universe.map.is_void(grid(0) - 1, grid(1) ,grid(2)) then
@@ -814,10 +837,19 @@ function empty_direction()as Integer{
 	dim empty as Integer
 	dim i as Integer
 
+	for i  = 0 to 2
+		println("forward("&i&") is "&my.forward_vector(i))
+	next i
+	for i  = 0 to 2
+		println("touch("&i&") is "&my.touch(i))
+	next i
+	for i  = 0 to 2
+		println("normal("&i&") is "&my.normal_vector(i))
+	next i
 	i = -1
 	if my.touch(0) != 0 and my.touch(1) != 0 and my.touch(2) != 0 then
 		for count = 0 to 2
-			if my.forward_vector(count) == 0 and my.normal_vector(count) == 0 then
+			if Abs(my.forward_vector(count)) != 1 and my.normal_vector(count) == 0 then
 				i = count
 			end if
 		next count
@@ -1449,16 +1481,19 @@ sub back_0(){
 	elseif my.X >= GetWidthSpace(universe.map) - 1 then
 		my.X = GetWidthSpace(universe.map) - 1
 	end if
+	
 	if my.y < 1 then
 		my.y = 1
 	elseif my.X >= GetHeightSpace(universe.map) - 1 then
 		my.y = GetHeightSpace(universe.map) - 1
 	end if
+
 	if my.z <= 0 then
 		my.z = 0
 	elseif my.Z >= 39 then
 		my.Z = 39
 	end if
+	println(my.Z)
 }
 
 function is_pause() as Boolean{
