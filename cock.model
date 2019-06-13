@@ -523,6 +523,12 @@ my.state = 1
 }
 
 Agt_Step{
+dim i as Integer
+	println("---------------------------------------------------")
+	for i = 0 to 2
+		println("touch("&i&") : "&my.touch(i))
+	next i 
+
 	if my.state == 0 then
 		do_stop()
 	else
@@ -546,7 +552,8 @@ function get_boundary(n as Integer) as Integer{
 */
 	dim i as Integer
 	dim ret as Integer
-	
+
+	ret = -1
 	for i = 0 to 2
 		if i != n and my.normal_vector(i) != 0 then
 			ret = i		
@@ -612,7 +619,7 @@ sub move_new_surface(){
 	end if	
 }
 
-	sub update_touch() {
+sub update_touch() {
 	dim x(3) as Double
 	dim y(3) as Double
 	dim n_v(3) as Double
@@ -671,6 +678,7 @@ sub move_new_surface(){
 
 	for i = 0 to 2		
 		my.touch(i) = y(i)
+		println("new touch is :"&my.touch(i))
 	next i
 } 
 
@@ -774,7 +782,7 @@ sub do_peripheral(){
 	else
 		//壁に沿う方向を決定し、その方向に進む
 		along_wall()
-		step_direction()
+		forward_one_step()
 	end if
 }
 
@@ -788,6 +796,7 @@ sub along_wall(){
 	dim i as Integer
 	
 	 n = empty_direction()
+	 println(n)
 	 if my.touch(n) == 0 then
 		 for i = 0 to 2
 		 	if i == n then
@@ -816,18 +825,19 @@ function empty_direction()as Integer{
 	dim empty as Integer
 	dim i as Integer
 
+	i = -1
 	if my.touch(0) != 0 and my.touch(1) != 0 and my.touch(2) != 0 then
+		for count = 0 to 2
+			if my.forward_vector(count) == 0 and my.normal_vector(count) == 0 then
+				i = count
+			end if
+		next count
+	else
 		empty = 1
 		Do Until empty == 0
 			i = Int( Rnd() * 3 )
 			empty = my.touch(i)
 		Loop
-	else
-		for count = 0 to 2
-			if my.forward_vector(count) != 0 and my.normal_vector(count) != 0 then
-				i = count
-			end if
-		next count
 	end if
 
 	return i
@@ -838,8 +848,7 @@ sub invade_central_zone(){
 角度を決定し、一歩前進
 */
 	decision_invade_angle()
-	step_direction()
-	
+	forward_one_step()	
 }
 
 sub decision_invade_angle(){
@@ -936,7 +945,7 @@ function is_stop_do_peripheral()as Boolean{
 
 function in_central() as Boolean{
 	/*
-	どこかが壁に接していたらtrue,どこも接していなければfalse
+	どこかが壁に接していたらfalse,どこも接していなければtrue
 	touchが自分の下以外に触れていたら壁に触れていると判断
 	*/
 	dim ret as Boolean
@@ -950,10 +959,12 @@ function in_central() as Boolean{
 		end if
 	next i
 
+	println("count is "&count)
+	
 	if count > 1 then
-		ret = true
-	else
 		ret = false
+	else
+		ret = True
 	end if
 	
 	return ret
@@ -1028,9 +1039,12 @@ sub do_stop() {
 
 sub do_central(){
 //中央部でどう動くか
+	println("do_central")
 	if is_stop_central() then
+	println("stop")
 		stop_insect()
 	else
+	println("step")
 		if my.state != 2 then
 			decide_direction_and_distance()
 		end if
@@ -1058,6 +1072,7 @@ sub stop_insect(){
 2.停止状態になる
 */
 	my.stop_time = Create_stop_time()
+	println("stoptime is "&My.stop_time)
 	my.state = 0
 }
 
@@ -1102,7 +1117,7 @@ function is_stop_central() as Boolean{
 	dim thread as Double
 
 	thread = universe.probability_stop_center
-
+//------------------------------------------------------------------------------------------------------------test
 	if Rnd() < thread then
 		ret = false
 	else
@@ -1117,6 +1132,7 @@ sub step_direction(){
  	1step分前進する
  	位置をオーバーしてたら元に戻す
 */
+println("step!")
 	my.X = my.X + my.forward_vector(0) * 0.6
 	my.Y = my.Y + my.forward_vector(1) * 0.6
 	my.Z = my.Z + my.forward_vector(2) * 0.6
@@ -4060,7 +4076,7 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -9, -9, 2578, 1408;
+    Window_Name = Main_Window, -8, 0, 1296, 1398;
     Window_Name = Output_Setting_Window, 423, 524, 480, 350;
     Window_Name = Artisoc_Help_Window, 10, 10, 730, 732;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
