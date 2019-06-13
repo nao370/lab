@@ -538,6 +538,8 @@ Agt_Step{
 	end if
 }
 
+//---------------------------------ここから下はコーディング済み--------------------------------------------
+
 function get_boundary(n as Integer) as Integer{
 /*
 どの軸を中心に回るかを決定する。面を変えるときにどの軸を越えるかと言い換えられる。
@@ -604,10 +606,139 @@ sub move_new_surface(){
 	end if
 	if not my.is_back then
 		update_touch()
-	end if
-	
-	my.dis_surface = -1	
+	end if	
 }
+
+	sub update_touch() {
+	dim x(3) as Double
+	dim y(3) as Double
+	dim n_v(3) as Double
+	dim i as Integer
+	dim b as Integer
+
+	b = my.b_type
+	for i = 0 to 2
+		n_v(i) = my.forward_vector(i)
+		x(i) = my.touch(i)
+	next i
+
+	if b == 0 then
+		y(0) = x(0)
+		y(1) = -x(1)
+		y(2) = -x(2)
+	elseif b == 1 then
+		y(0) = -x(0)
+		y(1) = x(1)
+		y(2) = -x(2)
+	elseif b == 2 then
+		y(0) = -x(0)
+		y(1) = -x(1)
+		y(2) = x(2)
+	elseif b == 3 then
+		if n_v(0) == 0 then
+			y(0) = x(0)
+			y(1) = -x(1)
+		else
+			y(0) = -x(0)
+			y(1) = x(1)
+		end if
+		y(2) = - x(2)
+	elseif b == 4 then
+		if n_v(0) == 0 then
+			y(0) = x(0)
+			y(2) = -x(2)
+		else
+			y(0) = -x(0)
+			y(2) = x(2)
+		end if
+		y(1) = - x(1)
+	elseif b == 5 then
+		if n_v(1) == 0 then
+			y(1) = x(1)
+			y(2) = -x(2)
+		else
+			y(1) = -x(1)
+			y(2) = x(2)
+		end if
+		y(0) = - x(0)
+	else
+		DebugStr("b_type miss in update touch")
+		TerminateAgt(my)
+	end if
+
+	for i = 0 to 2		
+		my.touch(i) = y(i)
+	next i
+} 
+
+sub back_surface(n as Integer){
+	dim pre as Integer
+	dim i as Integer
+	dim f(3) as Double
+	dim a(3) as Double
+
+	a(0) = close_num(my.X) - my.normal_vector(0)
+	a(1) = close_num(my.Y) - my.normal_vector(1)
+	a(2) = close_num(my.Z) - my.normal_vector(2)
+
+	for i =0 to 2
+		f(i) = GetHistory(my.forward_vector(i),1)
+		if f(i) != 0 then
+			f(i) = f(i) / Abs(f(i))
+		end if
+		if a(i) < 0 then
+			return
+		end if
+	next i
+
+
+	if is_filled() then
+		my.is_back = true
+		prev_forward()
+		my.X = GetHistory(my.X,1)
+		my.Y = GetHistory(my.Y,1)
+		my.Z = GetHistory(my.Z,1)
+	else
+		if check_void(a(0),a(1),a(2)) == 0 then
+			pre = GetHistory(my.touch(n),1)
+			if n == 0 and check_void(a(0)+ pre + f(0),a(1),a(2)) == 1 then
+				my.X = my.X + pre + f(0)
+				my.Y = my.Y 
+				my.Z = my.Z
+			elseif n == 1 and check_void(a(0),a(1)+pre+f(1),a(2)) == 1 then
+				my.X = my.X 
+				my.Y = my.Y + pre + f(1)
+				my.Z = my.Z 
+			elseif check_void(a(0),a(1),a(2)+ pre + f(2)) == 1 then
+				my.X = my.X 
+				my.Y = my.Y 
+				my.Z = my.Z + pre + f(2)
+			else
+				//ここに入りたくない
+					my.is_back = true
+					prev_forward()
+					my.X = GetHistory(my.X,1)
+					my.Y = GetHistory(my.Y,1)
+					my.Z = GetHistory(my.Z,1)
+			end if
+			my.is_back = true
+			prev_forward()
+		end if
+	end if
+}
+
+sub prev_forward(){
+//面を移る前の状態に戻す
+	dim i as Integer 
+	
+	for i = 0 to 2
+		my.forward_vector(i) = GetHistory(my.forward_vector(i),1)
+		my.touch(i) = GetHistory(my.touch(i),1)
+		my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
+	next i
+	my.do_type = GetHistory(my.do_type,1)
+}
+
 
 function is_touch_new_surface()as Boolean{
 
@@ -628,7 +759,6 @@ function is_touch_new_surface()as Boolean{
 	return ret
 }
 
-//---------------------------------ここから下はコーディング済み--------------------------------------------
 
 sub do_peripheral(){
 //周辺部でどう動くか
@@ -2112,98 +2242,6 @@ function is_differernt()as Boolean{
 	
 	return ret
 }
-
-sub back_surface(n as Integer){
-	dim pre as Integer
-	dim i as Integer
-	dim f(3) as Double
-	dim a(3) as Double
-
-	a(0) = close_num(my.X) - my.normal_vector(0)
-	a(1) = close_num(my.Y) - my.normal_vector(1)
-	a(2) = close_num(my.Z) - my.normal_vector(2)
-
-	for i =0 to 2
-		f(i) = GetHistory(my.forward_vector(i),1)
-		if f(i) != 0 then
-			f(i) = f(i) / Abs(f(i))
-		end if
-		if a(i) < 0 then
-			return
-		end if
-	next i
-
-
-	if is_filled() then
-		my.is_back = true
-		prev_forward()
-		my.X = GetHistory(my.X,1)
-		my.Y = GetHistory(my.Y,1)
-		my.Z = GetHistory(my.Z,1)
-	else
-		if check_void(a(0),a(1),a(2)) == 0 then
-			pre = GetHistory(my.touch(n),1)
-			if n == 0 and check_void(a(0)+ pre + f(0),a(1),a(2)) == 1 then
-				my.X = my.X + pre + f(0)
-				my.Y = my.Y 
-				my.Z = my.Z
-			elseif n == 1 and check_void(a(0),a(1)+pre+f(1),a(2)) == 1 then
-				my.X = my.X 
-				my.Y = my.Y + pre + f(1)
-				my.Z = my.Z 
-			elseif check_void(a(0),a(1),a(2)+ pre + f(2)) == 1 then
-				my.X = my.X 
-				my.Y = my.Y 
-				my.Z = my.Z + pre + f(2)
-			else
-				//ここに入りたくない
-					my.is_back = true
-					prev_forward()
-					my.X = GetHistory(my.X,1)
-					my.Y = GetHistory(my.Y,1)
-					my.Z = GetHistory(my.Z,1)
-				//応急処置
-				/*
-				DebugStr("miss in back surface")
-				DebugStr("      my.X :"&my.X)
-				DebugStr("      my.Y :"&my.Y)
-				DebugStr("      my.Z :"&my.Z)
-				DebugStr("      n :"&n)
-				DebugStr("      pre : "&pre)
-				for i = 0 to 2
-					DebugStr("      a("&i&") : "&a(i))
-				next i
-				if n == 0 then
-				 DebugStr("     check_void(a(0)+ pre + f(0),a(1),a(2))  :" &check_void(a(0)+ pre + f(0),a(1),a(2)))
-				 DebugStr("     f(0) :"&f(0))
-				elseif n == 1 then
-					DebugStr("     check_void(a(0),a(1)+pre+f(1),a(2))  :" &check_void(a(0),a(1)+pre+f(1),a(2)))
-					DebugStr("     f(1) :"&f(1))
-				else
-					DebugStr("     check_void(a(0),a(1),a(2)+ pre + f(2))  :" &check_void(a(0),a(1),a(2)+ pre + f(2)))
-					DebugStr("     f(2) :"&f(2))
-				end if
-				TerminateAgt(my)
-				
-			end if
-			my.is_back = true
-			prev_forward()
-		end if
-	end if
-}
-
-sub prev_forward(){
-//面を移る前の状態に戻す
-	dim i as Integer 
-	
-	for i = 0 to 2
-		my.forward_vector(i) = GetHistory(my.forward_vector(i),1)
-		my.touch(i) = GetHistory(my.touch(i),1)
-		my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
-	next i
-	my.do_type = GetHistory(my.do_type,1)
-}
-
 
 function type_gap(x as Double,a as Integer) as Integer{
 	dim ret as Integer
@@ -3732,68 +3770,6 @@ function is_disappear_surface() as Boolean{
 	return ret
 	}
 
-	sub update_touch() {
-	dim x(3) as Double
-	dim y(3) as Double
-	dim n_v(3) as Double
-	dim i as Integer
-	dim b as Integer
-
-	b = my.b_type
-	for i = 0 to 2
-		n_v(i) = my.forward_vector(i)
-		x(i) = my.touch(i)
-	next i
-
-	if b == 0 then
-		y(0) = x(0)
-		y(1) = -x(1)
-		y(2) = -x(2)
-	elseif b == 1 then
-		y(0) = -x(0)
-		y(1) = x(1)
-		y(2) = -x(2)
-	elseif b == 2 then
-		y(0) = -x(0)
-		y(1) = -x(1)
-		y(2) = x(2)
-	elseif b == 3 then
-		if n_v(0) == 0 then
-			y(0) = x(0)
-			y(1) = -x(1)
-		else
-			y(0) = -x(0)
-			y(1) = x(1)
-		end if
-		y(2) = - x(2)
-	elseif b == 4 then
-		if n_v(0) == 0 then
-			y(0) = x(0)
-			y(2) = -x(2)
-		else
-			y(0) = -x(0)
-			y(2) = x(2)
-		end if
-		y(1) = - x(1)
-	elseif b == 5 then
-		if n_v(1) == 0 then
-			y(1) = x(1)
-			y(2) = -x(2)
-		else
-			y(1) = -x(1)
-			y(2) = x(2)
-		end if
-		y(0) = - x(0)
-	else
-		DebugStr("b_type miss in update touch")
-		TerminateAgt(my)
-	end if
-
-	for i = 0 to 2		
-		my.touch(i) = y(i)
-	next i
-} 
-
 function calculate_theta() as Double{
 	dim theta as Double
 	dim n as Integer
@@ -4132,6 +4108,12 @@ Model_Description {
         Function get_boundary {
         }
         Function move_new_surface {
+        }
+        Function update_touch {
+        }
+        Function back_surface {
+        }
+        Function prev_forward {
         }
         Function is_touch_new_surface {
         }
