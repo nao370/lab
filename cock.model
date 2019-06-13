@@ -623,14 +623,16 @@ sub update_touch() {
 /*
 一番近いマスを見つけそのマスの周りを見る。forwardとかからも考える
 */
-	dim grid(3) Double
+	dim grid(3) as Double
 	dim i as Integer
 	
 	grid(0) = close_num(my.X)
 	grid(1) = close_num(my.Y)
 	grid(2) = close_num(my.Z)
 
-	if universe.map.is_void(grid(0) - 1, grid(1) ,grid(2)) then
+	if grid(0) - 1 <= 1 then
+		my.touch(0) = 1
+	elseif universe.map.is_void(grid(0) - 1, grid(1) ,grid(2)) then
 		my.touch(0) = 1
 	else
 		if universe.map.is_void(grid(0) + 1, grid(1) ,grid(2)) then
@@ -639,8 +641,10 @@ sub update_touch() {
 			my.touch(0) = 0
 		end if
 	end if
-
-		if universe.map.is_void(grid(0) , grid(1) -1 ,grid(2)) then
+	
+	if grid(1) - 1 <= 1 then
+		my.touch(1) = 1
+	elseif universe.map.is_void(grid(0) , grid(1) -1 ,grid(2)) then
 		my.touch(1) = 1
 	else
 		if universe.map.is_void(grid(0) , grid(1) + 1 ,grid(2)) then
@@ -650,7 +654,9 @@ sub update_touch() {
 		end if
 	end if
 
-		if universe.map.is_void(grid(0), grid(1) ,grid(2) - 1) then
+	if grid(2) - 1 <= 0 then
+		my.touch(2) = 1
+	elseif universe.map.is_void(grid(0), grid(1) ,grid(2) - 1) then
 		my.touch(2) = 1
 	else
 		if universe.map.is_void(grid(0), grid(1) ,grid(2) + 1) then
