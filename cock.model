@@ -47,6 +47,7 @@ UNIVERSE {
             Dim state(0, 0) As Integer = (0);
             Dim stop_time(0, 0) As Integer = (0);
             Dim time_of_randomwalk(0, 0) As Integer = (0);
+            Dim pre_touch(0, 0)[3] As Integer = ();
         }
         AgtType barrier(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
@@ -537,9 +538,97 @@ Agt_Step{
 	end if
 }
 
+function get_boundary(n as Integer) as Integer{
+/*
+どの軸を中心に回るかを決定する。面を変えるときにどの軸を越えるかと言い換えられる。
+*/
+	dim i as Integer
+	dim ret as Integer
+	
+	for i = 0 to 2
+		if i != n and my.normal_vector(i) != 0 then
+			ret = i		
+		end if
+	next i
+
+	return ret
+}
+
 sub move_new_surface(){
 //新しい面に移る動き
+	dim n as Integer
+	dim i as Integer
+
+	for i = 0 to 2
+		if my.touch(i) != 0 and my.pre_touch(i) == 0 then
+			n = i
+		end if
+		my.pre_touch(i) = my.touch(i)
+	next i
+
+	b = get_boundary(n)
+
+		for i =0 to 2
+		pre(i) = GetHistory(my.touch(i),1)
+		f(i) = GetHistory(my.forward_vector(i),1)
+		if f(i) != 0 then
+			f(i) = f(i) / Abs(f(i))
+		end if
+	next i
+
+	if b < 3 then
+		if b == 0 then
+			f(0) = 0
+		elseif b == 1 then
+			f(1) = 0
+		elseif b == 2 then
+			f(2) = 0
+		end if
+	end if
+
+	if n == 0 then
+		my.X = my.X - pre(0)
+		my.Y = my.Y + f(1)
+		my.Z = my.Z + f(2)
+		back_surface(0)
+	elseif n == 1 then
+		my.X = my.X + f(0)
+		my.Y = my.Y - pre(1)
+		my.Z = my.Z + f(2)
+		back_surface(1)
+	else
+		my.X = my.X + f(0)
+		my.Y = my.Y + f(1)
+		my.Z = my.Z - pre(2)
+		back_surface(2)
+	end if
+	if not my.is_back then
+		update_touch()
+	end if
+	
+	my.dis_surface = -1	
 }
+
+function is_touch_new_surface()as Boolean{
+
+/*
+新しい面に触れていたらtrue,振れていなければfalseを返す
+*/
+	dim ret as Boolean
+	dim i as Integer
+
+	ret = false
+
+	for i = 0 to 2
+		if my.touch(i) != 0 and my.pre_touch(i) == 0 then
+			ret = true
+		end if
+	next i
+	
+	return ret
+}
+
+//---------------------------------ここから下はコーディング済み--------------------------------------------
 
 sub do_peripheral(){
 //周辺部でどう動くか
@@ -559,19 +648,57 @@ sub do_peripheral(){
 sub along_wall(){
 /*
 壁に沿う動きにおいて、次の方向を決定する
+1. nは空いている面。
+2.その方向に向く
 */
+	dim n as Integer
+	dim i as Integer
+	
+	 n = empty_direction()
+	 if my.touch(n) == 0 then
+		 for i = 0 to 2
+		 	if i == n then
+		 		my.forward_vector(i) = (-1) ^ ( Int( Rnd() * 2 ) )
+		 	else
+		 		my.forward_vector(i) = 0
+		 	end if
+		 next i
+		else
+		 for i = 0 to 2
+		 	if i == n then
+		 		my.forward_vector(i) = (-1) * my.touch(n)
+		 	else
+		 		my.forward_vector(i) = 0
+		 	end if
+		 next i
+		end if
 }
 
-function is_touch_new_surface()as Boolean{
-	dim ret as Boolean
+function empty_direction()as Integer{
 /*
-新しい面に触れていたらtrue,振れていなければfalseを返す
+触れていない面の中からランダムに一つ選ぶ
 */
-	ret = false
-	return ret
-}
+	dim ret as Integer
+	dim count as Integer
+	dim empty as Integer
+	dim i as Integer
 
-//---------------------------------ここから下はコーディング済み--------------------------------------------
+	if my.touch(0) != 0 and my.touch(1) != 0 and my.touch(2) != 0 then
+		empty = 1
+		Do Until empty == 0
+			i = Int( Rnd() * 3 )
+			empty = my.touch(i)
+		Loop
+	else
+		for count = 0 to 2
+			if my.forward_vector(count) != 0 and my.normal_vector(count) != 0 then
+				i = count
+			end if
+		next count
+	end if
+
+	return i
+}
 
 sub invade_central_zone(){
 /*
@@ -3667,57 +3794,6 @@ function is_disappear_surface() as Boolean{
 	next i
 } 
 
-
-sub step_surface(){
-	dim pre(3) as	Integer
-	dim f(3) as Double
-	dim n as Integer
-	dim i as Integer
-	dim b as Integer
-
-	n = my.dis_surface
-	b = my.b_type
-	for i =0 to 2
-		pre(i) = GetHistory(my.touch(i),1)
-		f(i) = GetHistory(my.forward_vector(i),1)
-		if f(i) != 0 then
-			f(i) = f(i) / Abs(f(i))
-		end if
-	next i
-
-	if b < 3 then
-		if b == 0 then
-			f(0) = 0
-		elseif b == 1 then
-			f(1) = 0
-		elseif b == 2 then
-			f(2) = 0
-		end if
-	end if
-
-	if n == 0 then
-		my.X = my.X - pre(0)
-		my.Y = my.Y + f(1)
-		my.Z = my.Z + f(2)
-		back_surface(0)
-	elseif n == 1 then
-		my.X = my.X + f(0)
-		my.Y = my.Y - pre(1)
-		my.Z = my.Z + f(2)
-		back_surface(1)
-	else
-		my.X = my.X + f(0)
-		my.Y = my.Y + f(1)
-		my.Z = my.Z - pre(2)
-		back_surface(2)
-	end if
-	if not my.is_back then
-		update_touch()
-	end if
-	
-	my.dis_surface = -1	
-}
-
 function calculate_theta() as Double{
 	dim theta as Double
 	dim n as Integer
@@ -4001,9 +4077,9 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -8, 0, 1296, 1398;
+    Window_Name = Main_Window, -9, -9, 2578, 1408;
     Window_Name = Output_Setting_Window, 423, 524, 480, 350;
-    Window_Name = Artisoc_Help_Window, 10, 10, 970, 469;
+    Window_Name = Artisoc_Help_Window, 10, 10, 730, 732;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
     Window_Name = Space_3D_Setting_Window, 746, 251, 450, 540;
 }
@@ -4053,13 +4129,17 @@ Model_Description {
         }
         Function Agt_Step {
         }
+        Function get_boundary {
+        }
         Function move_new_surface {
+        }
+        Function is_touch_new_surface {
         }
         Function do_peripheral {
         }
         Function along_wall {
         }
-        Function is_touch_new_surface {
+        Function empty_direction {
         }
         Function invade_central_zone {
         }
