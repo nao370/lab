@@ -47,7 +47,7 @@ UNIVERSE {
             Dim state(0, 0) As Integer = (0);
             Dim stop_time(0, 0) As Integer = (0);
             Dim time_of_randomwalk(0, 0) As Integer = (0);
-            Dim pre_touch(0, 0)[3] As Integer = ();
+            Dim pre_touch(0, 0)[3] As Integer = (3*0);
         }
         AgtType barrier(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
@@ -512,6 +512,7 @@ my.forward_vector(1) = Sin(DegreeToRad(my.Direction))
 my.do_type = 1
 my.ap_or_dis = 1
 my.normal_vector(2) = 1
+My.pre_touch(2) = 1
 my.touch(2) = 1
 my.dis_surface = -1
 my.edge_flag = false
@@ -519,54 +520,107 @@ my.X = 1 + rnd() *0.5
 my.Y = 1 + rnd() *0.5
 my.Z = 0
 my.T_al = Int(Rnd()*10)
-my.state = 1
+my.state = COLOR_BLACK
 }
 
 Agt_Step{
+	dim i as Integer
 
-	if my.state == 0 then
+	if my.state == COLOR_BLUE then
 		do_stop()
 	else
 		if in_central() then
 			do_central()
 		else
 			if is_touch_new_surface() then
-				move_new_surface()
+				if Rnd() < 0.5 then
+					move_new_surface()
+				else
+					for i = 0 to 2
+						my.pre_touch(i) = my.touch(i)
+					next i
+					do_peripheral()
+				end if
+			elseif is_disappear_surface() then
+				if Rnd() < 0.5 then
+					jump_new_surface()
+				else
+					for i = 0 to 2
+						my.pre_touch(i) = my.touch(i)
+					next i
+					do_peripheral()
+				end if
 			else
 				do_peripheral()
 			end if
 		end if
 	end if
 
-	dim i as Integer
-
 	for i = 0 to 2
 		println("forward("&i&") is "&my.forward_vector(i))
 	next i
+	println("state is "&my.state)
 	println("--------------------------------------------------------------")
 }
 
-//---------------------------------ここから下はコーディング済み--------------------------------------------
-
-function get_boundary(n as Integer) as Integer{
+function is_disappear_surface() as Boolean{
 /*
-どの軸を中心に回るかを決定する。面を変えるときにどの軸を越えるかと言い換えられる。
+今までいる面が途切れたらtrue,続いていらばfalse
 */
+	dim f(3) as Integer
+	dim grid(3) as Integer
+	dim grid_al(3) as Integer
 	dim i as Integer
-	dim ret as Integer
+	dim ret as Boolean
 
-	ret = -1
 	for i = 0 to 2
-		if i != n and my.normal_vector(i) != 0 then
-			ret = i		
+		if my.forward_vector(i) < 0 then
+			f(i) = -1
+		elseif my.forward_vector(i) > 0 then
+			f(i) = 1
+		else
+			f(i) = 0
 		end if
 	next i
+
+	grid(0) = close_num(my.X) + f(0) - my.normal_vector(0)
+	grid(1) = close_num(my.Y) + f(1) - my.normal_vector(1)
+	grid(2) = close_num(my.Z) + f(2) - my.normal_vector(2)
+	
+	grid_al(0) = close_num(my.X) - my.normal_vector(0)
+	grid_al(1) = close_num(my.Y) - my.normal_vector(1)
+	grid_al(2) = close_num(my.Z) - my.normal_vector(2)
+
+	for i = 0 to 2
+		if grid(i) < 0 then
+			grid(i) = 0
+		end if
+		if grid_al(i) < 0 then
+			grid_al(i) = 0
+		end if
+	next i
+
+	if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0) + f(0),grid_al(1),grid_al(2)) then
+		ret = true
+		my.b_type = 0
+	else
+		if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0),grid_al(1)+f(1),grid_al(2)) then
+			ret = true
+			my.b_type = 1
+		else
+			if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0),grid_al(1),grid_al(2)+f(2)) then
+				ret = true
+				my.b_type = 2
+			else
+				ret = false
+			end if
+		end if
+	end if
 
 	return ret
 }
 
-sub move_new_surface(){
-//新しい面に移る動き
+sub jump_new_surface(){
 	dim n as Integer
 	dim i as Integer
 	dim b as Integer
@@ -575,19 +629,13 @@ sub move_new_surface(){
 
 	for i = 0 to 2
 		pre(i) = my.pre_touch(i)
-	next i
-
-	for i = 0 to 2
-		if my.touch(i) != 0 and my.pre_touch(i) == 0 then
-			n = i
-		end if
 		my.pre_touch(i) = my.touch(i)
 	next i
 
-	b = get_boundary(n)
+	b = my.b_type
 	
 		for i =0 to 2
-		f(i) = GetHistory(my.forward_vector(i),1)
+		f(i) = my.forward_vector(i)
 		if f(i) != 0 then
 			f(i) = f(i) / Abs(f(i))
 		end if
@@ -603,6 +651,7 @@ sub move_new_surface(){
 		end if
 	end if
 
+	my.ap_or_dis = -1
 	if n == 0 then
 		my.X = my.X - pre(0)
 		my.Y = my.Y + f(1)
@@ -620,8 +669,165 @@ sub move_new_surface(){
 		back_surface(2)
 	end if
 	if not my.is_back then
+		matrix()
 		update_touch()
+		My.is_back = false
 	end if	
+}
+
+sub move_new_surface(){
+//新しい面に移る動き
+//位置は変わらずに方向のみ帰る
+	dim n as Integer
+	dim i as Integer
+	dim b as Integer
+	dim pre(3) as Integer
+	dim f(3) as Double
+
+	for i = 0 to 2
+		pre(i) = my.pre_touch(i)
+	next i
+
+	for i = 0 to 2
+		if my.touch(i) != 0 and my.pre_touch(i) == 0 then
+			n = i
+		end if
+		my.pre_touch(i) = my.touch(i)
+	next i
+
+	println("  n = "&n)
+	b = get_boundary(n)
+	my.b_type = b
+	println("b = "&b)
+	my.ap_or_dis = 1
+	matrix()
+}
+
+function calculate_theta() as Double{
+	dim theta as Double
+	dim n as Integer
+	dim i as Integer
+	dim jud as Double
+	dim f as Double
+
+	for i = 0 to 2
+		if my.normal_vector(i) != 0 then
+			n = my.normal_vector(i)//正からふれてるかどうか
+			break
+		end if
+	next i
+
+	if my.b_type == 0 then
+		if i == 1 then
+			f = my.forward_vector(2)
+		elseif i == 2 then
+			f = -my.forward_vector(1)
+		else
+			println("miss in theta1")
+		end if
+	elseif my.b_type == 1 then
+		if i == 0 then
+			f = -my.forward_vector(2)
+		elseif i == 2 then
+			f = my.forward_vector(0)
+		else
+			println("miss in theta2")
+		end if
+	elseif my.b_type == 2 then
+		if i == 0 then
+			f = my.forward_vector(1)
+		elseif i == 1 then
+			f = -my.forward_vector(0)
+		else
+			println("miss in theta3")
+		end if
+	else
+		println("miss in theta4")
+	end if
+
+	jud = f * n * my.ap_or_dis
+	if jud > 0 then
+		theta = DegreeToRad(90)
+	elseif jud < 0 then
+		theta = DegreeToRad(270)
+	else
+		println("miss in theta5")
+		println("jud :"&jud)
+		theta = DegreeToRad(90)
+	end if
+
+	return theta
+	}
+
+sub matrix(){
+	dim x(3) as Double
+	dim y(3) as Double
+	dim b(3) as Double
+	dim R(3,3) as Double
+	dim i as Integer
+	dim j as Integer
+	dim theta as Double
+	dim n as Integer
+
+	n = my.b_type
+	x(0) = my.forward_vector(0)
+	x(1) = my.forward_vector(1)
+	x(2) = my.forward_vector(2)
+
+	theta = calculate_theta()
+	if n == 0 then
+		b(0) = -1
+		b(1) = 0
+		b(2) = 0
+	elseif n == 1 then
+		b(0) = 0
+		b(1) = -1
+		b(2) = 0
+	elseif n == 2 then
+		b(0) = 0
+		b(1) = 0
+		b(2) = -1
+	else
+		println("原因ここやんけ")
+	end if
+
+	R(0,0) = b(0)^2 * (1 - Cos(theta)) + Cos(theta)
+	R(0,1) = b(0) * b(1) * (1 - Cos(theta)) - b(2) * Sin(theta)
+	R(0,2) = b(2) * b(0) * (1 - Cos(theta)) + b(1) * Sin(theta)
+
+	R(1,0) = b(0) * b(1) * (1 - Cos(theta)) + b(2) * Sin(theta)
+	R(1,1) = b(1)^2 * (1 - Cos(theta)) + Cos(theta)
+	R(1,2) = b(1) * b(2) * (1 - Cos(theta)) - b(0) * Sin(theta)
+
+	R(2,0) = b(2) * b(0) * (1 - Cos(theta)) - b(1) * Sin(theta)
+	R(2,1) = b(1) * b(2) * (1 - Cos(theta)) + b(0) * Sin(theta)
+	R(2,2) = b(2)^2 * (1 - Cos(theta)) + Cos(theta)
+
+	for i = 0 to 2
+		my.forward_vector(i) = x(0) * R(i,0) + x(1) * R(i,1) + x(2) * R(i,2)
+		if Abs(my.forward_vector(i)) < 0.0000001 then
+			my.forward_vector(i) = 0
+		end if
+	next i
+}
+
+//---------------------------------ここから下はコーディング済み--------------------------------------------
+
+function get_boundary(n as Integer) as Integer{
+/*
+どの軸を中心に回るかを決定する。面を変えるときにどの軸を越えるかと言い換えられる。
+*/
+	dim i as Integer
+	dim ret as Integer
+
+	ret = -1
+	for i = 0 to 2
+		if i != n and my.normal_vector(i) == 0 then
+			ret = i		
+		end if
+	next i
+
+	return ret
 }
 
 sub update_touch() {
@@ -923,8 +1129,12 @@ function is_stop_do_peripheral()as Boolean{
 周辺の動作をやめるならtrue,そのまま続けるならfalseを返す
 */
 	dim ret as Boolean
+	dim r as Double
 
-	if Rnd() < universe.probability_continue_periphery then
+	r = 0.1
+	r = Rnd()
+	
+	if r < universe.probability_continue_periphery then
 		ret = false
 	else
 		ret = true
@@ -1020,8 +1230,9 @@ sub do_stop() {
 //停止状態でどう動くか
 	if my.stop_time > 0 then
 		my.stop_time = my.stop_time - 1
+		println("my.stop_time :"&my.stop_time)
 	else
-		my.state = 0
+		my.state = COLOR_BLACK
 	end if
 }
 
@@ -1030,7 +1241,7 @@ sub do_central(){
 	if is_stop_central() then
 		stop_insect()
 	else
-		if my.state != 2 then
+		if my.state != COLOR_RED then
 			decide_direction_and_distance()
 		end if
 		forward_one_step()
@@ -1057,7 +1268,7 @@ sub stop_insect(){
 2.停止状態になる
 */
 	my.stop_time = Create_stop_time()
-	my.state = 0
+	my.state = COLOR_BLUE
 }
 
 function Create_stop_time() as Integer{
@@ -1947,48 +2158,6 @@ Repeat_Simulation {
 
 
 //-------------------------------------------------------
-// Time Graph Output Definition Division
-//-------------------------------------------------------
-Time_Graph {
-    Font_Name = "Dialog";
-    Font_Char_Set = 81;
-    Font_Size = 12.0;
-    Font_Style = 0;
-    Font_Color = 0, 0, 0;
-    Font_Background_Color = 255, 255, 255;
-    Draw_Timing = Simulation_Step;
-    Draw_Interval = 1;
-    Graph_Name = "test";
-    Title = "test";
-    Disable = No;
-    Background_Color = 255, 255, 255;
-    Remarks = Yes;
-    Legend_Pos = Top;
-    FastDraw = Yes;
-    Position_x = 1;
-    Position_y = -12;
-    Size_x = 1037;
-    Size_y = 761;
-    Map_Cell_Size = -1;
-    Axis_Label = "step", "voxel";
-    Draw_By_JFree_Chart = Yes;
-    Scale = 0, 0.0, 1000, 100.0, 100, 10.0;
-    ScaleAuto = Yes, Yes;
-    Output_Group_Name = "";
-    Output {
-        Graph_Element_Name = "fin";
-        Line_Color = 255, 0, 0;
-        Line_Width = 2;
-        Marker_Id = 0;
-        Output_Expression = "universe.num_fin";
-        Expression_Value_Display = No;
-        Effective_Fraction_Figures = 0;
-        Graph_Element_Color = (204, 0, 0);
-    }
-}
-
-
-//-------------------------------------------------------
 // 2 Dimension Map Display Definition Division
 //-------------------------------------------------------
 Map_Output {
@@ -2043,7 +2212,7 @@ Map_Output {
         Line_Arrow_Variable = "";
         Line_Width_Variable = "";
         Line_Color_Variable = "";
-        Agent_Color = 255,0,0;
+        Agent_Color = "Universe.map.insect.state";
         Marker_Id = 1;
         Effective_Figures = 0;
         Format_Id = 0;
@@ -2245,9 +2414,17 @@ Model_Description {
         }
         Function Agt_Step {
         }
-        Function get_boundary {
+        Function is_disappear_surface {
+        }
+        Function jump_new_surface {
         }
         Function move_new_surface {
+        }
+        Function calculate_theta {
+        }
+        Function matrix {
+        }
+        Function get_boundary {
         }
         Function update_touch {
         }
