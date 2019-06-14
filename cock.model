@@ -933,42 +933,42 @@ sub update_touch() {
 		else
 			f(i) = Abs(my.forward_vector(i)) / my.forward_vector(i)
 		end if
+		println("f("&i&") : "&f(i))
 	next i
 
 	for i = 0 to 2
 		println("grid("&i&") : "&grid(i))
 	next i
 
-	if grid(0) - f(0) < 0 then
+	if grid(0) + f(0) < 0 then
 		my.touch(0) = 1
 	else
-		if universe.map.is_void(grid(0) - f(0), grid(1) ,grid(2)) and grid(0) == my.X then
+		if universe.map.is_void(grid(0) + f(0), grid(1) ,grid(2)) and grid(0) == my.X then
 			my.touch(0) = -f(0)
 		else
 			my.touch(0) = 0
 		end if
 	end if
 	
-	if grid(1) - f(1) < 0 then
+	if grid(1) + f(1) < 0 then
 		my.touch(1) = 1
 	else
-		if universe.map.is_void(grid(0) , grid(1) - f(1) ,grid(2)) and grid(1) == my.Y then
+		if universe.map.is_void(grid(0) , grid(1) + f(1) ,grid(2)) and grid(1) == my.Y then
 			my.touch(1) = -f(1)
 		else
 			my.touch(1) = 0
 		end if
 	end if
 
-	if grid(2) - f(2) < 0 then
+	if grid(2) + f(2) < 0 then
 		my.touch(2) = 1
 	else
-		if universe.map.is_void(grid(0), grid(1) ,grid(2) - f(2)) and grid(2) == my.Z then
-			my.touch(2) = -1
+		if universe.map.is_void(grid(0), grid(1) ,grid(2) + f(2)) and grid(2) == my.Z then
+			my.touch(2) = -f(2)
 		else
 			my.touch(2) = 0
 		end if
 	end if
-	
 } 
 
 sub back_surface(n as Integer){
