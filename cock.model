@@ -1325,12 +1325,11 @@ sub forward_one_step(){
 ‚à‚µ“r’†‚ÅáŠQ•¨‚ª‚ ‚ê‚Î‚»‚ÌˆÊ’u‚Å~‚Ü‚é
 */
 	step_direction()
-	update_touch()
-	update_normal()
-
 	if not is_step() then
 		back_step()
 	end if
+	update_touch()
+	update_normal()
 }
 
 sub stop_insect(){
