@@ -724,7 +724,7 @@ sub move_new_surface(){
 	next i
 
 	for i = 0 to 2
-		if my.touch(i) != 0 and my.pre_touch(i) == 0 then
+		if my.touch(i) != 0 and my.pre_touch(i) != my.touch(i) then
 			n = i
 		end if
 		my.pre_touch(i) = my.touch(i)
@@ -940,8 +940,10 @@ sub update_touch() {
 		println("grid("&i&") : "&grid(i))
 	next i
 
-	if grid(0) + f(0) < 0 then
+	if grid(0) + f(0) < 0 or my.X == 1 then
 		my.touch(0) = 1
+	elseif grid(0) + f(0) > GetWidthSpace(universe.map) - 1 or my.X == GetWidthSpace(universe.map) - 2 then
+		my.touch(0) = -1
 	else
 		if universe.map.is_void(grid(0) + f(0), grid(1) ,grid(2)) and grid(0) == my.X then
 			my.touch(0) = -f(0)
@@ -950,8 +952,10 @@ sub update_touch() {
 		end if
 	end if
 	
-	if grid(1) + f(1) < 0 then
+	if grid(1) + f(1) < 0 or my.Y == 1 then
 		my.touch(1) = 1
+	elseif grid(1) + f(1) > GetHeightSpace(universe.map) - 1 or my.Y == GetHeightSpace(universe.map) - 2 then
+		my.touch(1) = -1
 	else
 		if universe.map.is_void(grid(0) , grid(1) + f(1) ,grid(2)) and grid(1) == my.Y then
 			my.touch(1) = -f(1)
@@ -960,8 +964,10 @@ sub update_touch() {
 		end if
 	end if
 
-	if grid(2) + f(2) < 0 then
+	if grid(2) + f(2) < 0 or my.Z == 0 then
 		my.touch(2) = 1
+	elseif my.Z == 39 or grid(2) + f(2) > 39 then
+		my.touch(2) = -1
 	else
 		if universe.map.is_void(grid(0), grid(1) ,grid(2) + f(2)) and grid(2) == my.Z then
 			my.touch(2) = -f(2)
@@ -1051,7 +1057,7 @@ function is_touch_new_surface()as Boolean{
 	ret = false
 
 	for i = 0 to 2
-		if my.touch(i) != 0 and my.pre_touch(i) == 0 then
+		if my.touch(i) != 0 and my.pre_touch(i) != my.touch(i) then
 			ret = true
 		end if
 	next i
@@ -1102,7 +1108,7 @@ sub along_wall(){
 		else
 		 for i = 0 to 2
 		 	if i == n then
-		 		my.forward_vector(i) = (-1) * my.touch(n)
+		 		my.forward_vector(i) =  my.touch(n)
 		 	else
 		 		my.forward_vector(i) = 0
 		 	end if
