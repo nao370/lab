@@ -736,6 +736,7 @@ sub move_new_surface(){
 	println("b = "&b)
 	my.ap_or_dis = 1
 	matrix()
+	update_normal_vector()
 }
 
 sub update_normal_vector(n as Integer,b as Integer){
@@ -2222,11 +2223,11 @@ Map_Output {
     Title = "aaa";
     Disable = No;
     Background_Color = 255, 255, 255;
-    Position_x = 1440;
-    Position_y = 3;
-    Size_x = 622;
+    Position_x = 1032;
+    Position_y = -16;
+    Size_x = 511;
     Size_y = 829;
-    Map_Cell_Size = 0;
+    Map_Cell_Size = 1;
     Remarks = Yes;
     Legend_Pos = Top;
     Font_Name = "Dialog";
@@ -2353,14 +2354,14 @@ Others_Data {
     Rule_Colored = Yes;
     Rule_LineNo = Yes;
     Window_Hide_Run = 1;
-    Debug_Position_x = 7;
-    Debug_Position_y = 8;
+    Debug_Position_x = 598;
+    Debug_Position_y = 28;
     Debug_Size_x = 400;
     Debug_Size_y = 200;
-    Console_Position_x = 0;
-    Console_Position_y = -13;
-    Console_Size_x = 572;
-    Console_Size_y = 922;
+    Console_Position_x = 2;
+    Console_Position_y = -11;
+    Console_Size_x = 435;
+    Console_Size_y = 642;
     Componen_Tree_Position_x = -24;
     Componen_Tree_Position_y = -3;
     Componen_Tree_Size_x = 250;
@@ -2418,7 +2419,7 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -9, -9, 2578, 1408;
+    Window_Name = Main_Window, -9, -9, 1618, 868;
     Window_Name = Output_Setting_Window, 1064, 529, 480, 350;
     Window_Name = Artisoc_Help_Window, 10, 10, 730, 732;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
