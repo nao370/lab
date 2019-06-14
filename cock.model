@@ -915,6 +915,7 @@ sub update_touch() {
 一番近いマスを見つけそのマスの周りを見る。forwardとかからも考える
 */
 	dim grid(3) as Double
+	dim f(3) as Double
 	dim i as Integer
 
 	println("")
@@ -926,40 +927,38 @@ sub update_touch() {
 	grid(1) = close_num(my.Y)
 	grid(2) = close_num(my.Z)
 
+	f(0) = Abs(my.forward_vector(0)) / my.forward_vector(0)
+	f(1) = Abs(my.forward_vector(1)) / my.forward_vector(1)
+	f(0) = Abs(my.forward_vector(2)) / my.forward_vector(2)
+
 	for i = 0 to 2
 		println("grid("&i&") : "&grid(i))
 	next i
 
-	if grid(0) - 1 < 0 then
-		my.touch(0) = 1
-	elseif universe.map.is_void(grid(0) - 1, grid(1) ,grid(2)) and grid(0) == my.X then
+	if grid(0) - f(0) < 0 then
 		my.touch(0) = 1
 	else
-		if universe.map.is_void(grid(0) + 1, grid(1) ,grid(2)) and grid(0) == my.X then
-			my.touch(0) = -1
+		if universe.map.is_void(grid(0) - f(0), grid(1) ,grid(2)) and grid(0) == my.X then
+			my.touch(0) = -f(0)
 		else
 			my.touch(0) = 0
 		end if
 	end if
 	
-	if grid(1) - 1 < 0 then
-		my.touch(1) = 1
-	elseif universe.map.is_void(grid(0) , grid(1) -1 ,grid(2)) and grid(1) == my.Y then
+	if grid(1) - f(1) < 0 then
 		my.touch(1) = 1
 	else
-		if universe.map.is_void(grid(0) , grid(1) + 1 ,grid(2)) and grid(1) == my.Y then
-			my.touch(1) = -1
+		if universe.map.is_void(grid(0) , grid(1) - f(1) ,grid(2)) and grid(1) == my.Y then
+			my.touch(1) = -f(1)
 		else
 			my.touch(1) = 0
 		end if
 	end if
 
-	if grid(2) - 1 < 0 then
-		my.touch(2) = 1
-	elseif universe.map.is_void(grid(0), grid(1) ,grid(2) - 1) and grid(2) == my.Z then
+	if grid(2) - f(2) < 0 then
 		my.touch(2) = 1
 	else
-		if universe.map.is_void(grid(0), grid(1) ,grid(2) + 1) and grid(2) == my.Z then
+		if universe.map.is_void(grid(0), grid(1) ,grid(2) - f(2)) and grid(2) == my.Z then
 			my.touch(2) = -1
 		else
 			my.touch(2) = 0
