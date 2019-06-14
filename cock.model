@@ -736,10 +736,11 @@ sub move_new_surface(){
 	println("b = "&b)
 	my.ap_or_dis = 1
 	matrix()
-	update_normal_vector()
+	update_normal_vector(n)
+	forward_one_step()
 }
 
-sub update_normal_vector(n as Integer,b as Integer){
+sub update_normal_vector(n as Integer){
 // normalÇÃçXêV
 	dim i as Integer
 
@@ -889,10 +890,19 @@ sub update_touch() {
 */
 	dim grid(3) as Double
 	dim i as Integer
-	
+
+	println("")
+	println("X "&my.X)
+	println("Y "&my.Y)
+	println("Z "&my.Z)
+			
 	grid(0) = close_num(my.X)
 	grid(1) = close_num(my.Y)
 	grid(2) = close_num(my.Z)
+
+	for i = 0 to 2
+		println("grid("&i&") : "&grid(i))
+	next i
 
 	if grid(0) - 1 < 0 then
 		my.touch(0) = 1
@@ -1049,10 +1059,13 @@ sub along_wall(){
 	dim i as Integer
 	
 	 n = empty_direction()
+	 println("n is "&n&" in along wall")
 	 if my.touch(n) == 0 then
 		 for i = 0 to 2
-		 	if i == n then
+		 	if i == n and my.forward_vector(i) == 0 then
 		 		my.forward_vector(i) = (-1) ^ ( Int( Rnd() * 2 ) )
+		 	elseif i == n then
+		 		my.forward_vector(i) = my.forward_vector(i) / Abs(my.forward_vector(i))
 		 	else
 		 		my.forward_vector(i) = 0
 		 	end if
@@ -2360,7 +2373,7 @@ Others_Data {
     Debug_Size_y = 200;
     Console_Position_x = 2;
     Console_Position_y = -11;
-    Console_Size_x = 435;
+    Console_Size_x = 330;
     Console_Size_y = 642;
     Componen_Tree_Position_x = -24;
     Componen_Tree_Position_y = -3;
