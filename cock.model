@@ -914,6 +914,7 @@ sub update_touch() {
 /*
 一番近いマスを見つけそのマスの周りを見る。forwardとかからも考える
 */
+//どのマスを見るべきかの式があいまい。
 	dim grid(3) as Double
 	dim f(3) as Double
 	dim i as Integer
