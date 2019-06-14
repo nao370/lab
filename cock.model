@@ -927,9 +927,13 @@ sub update_touch() {
 	grid(1) = close_num(my.Y)
 	grid(2) = close_num(my.Z)
 
-	f(0) = Abs(my.forward_vector(0)) / my.forward_vector(0)
-	f(1) = Abs(my.forward_vector(1)) / my.forward_vector(1)
-	f(0) = Abs(my.forward_vector(2)) / my.forward_vector(2)
+	for i = 0 to 2
+		if my.forward_vector(i) == 0 then
+			f(i) = 0
+		else
+			f(i) = Abs(my.forward_vector(i)) / my.forward_vector(i)
+		end if
+	next i
 
 	for i = 0 to 2
 		println("grid("&i&") : "&grid(i))
@@ -2261,8 +2265,8 @@ Map_Output {
     Title = "aaa";
     Disable = No;
     Background_Color = 255, 255, 255;
-    Position_x = 1063;
-    Position_y = 19;
+    Position_x = 1158;
+    Position_y = -1;
     Size_x = 511;
     Size_y = 829;
     Map_Cell_Size = 1;
