@@ -858,6 +858,10 @@ sub jump_new_surface(){
 		if my.normal_vector(i) != 0 then
 			n = i
 		end if
+		f(i) = my.forward_vector(i)
+		if f(i) != 0 then
+			f(i) = f(i) / Abs(f(i))
+		end if
 	next i
 	
 	b = my.b_type
@@ -2350,10 +2354,19 @@ function is_jump() as Boolean{
 	dim nx as Integer
 	dim ny as Integer
 	dim nz as Integer
+	dim i as Integer
+	dim f(3) as Integer
 
-	nx = Int(my.X)
-	ny = Int(my.Y)
-	nz = Int(my.Z)
+	nx = close_num(my.X)//Int(my.X)
+	ny = close_num(my.Y)//Int(my.Y)
+	nz = close_num(my.Z)//Int(my.Z)
+
+	for i =0 to 2
+		f(i) = my.forward_vector(i)
+		if f(i) != 0 then
+			f(i) = f(i) / Abs(f(i))
+		end if
+	next i
 	
 	type = my.do_type
 	println("do_type :"&my.do_type)
@@ -2363,7 +2376,7 @@ function is_jump() as Boolean{
 			if nz == 0 and my.normal_vector(2) > 0 then
 				ret = false
 			else
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny,nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					if my.X == nx then
@@ -2377,7 +2390,7 @@ function is_jump() as Boolean{
 			if ny == 0 and my.normal_vector(1) > 0 then
 				ret = false
 			else
-				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx+1,ny - my.normal_vector(1),nz) == 1 then
+				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx+f(0),ny - my.normal_vector(1),nz) == 1 then
 					ret = false
 				else
 					if my.x == nx then
@@ -2393,7 +2406,7 @@ function is_jump() as Boolean{
 			ret = false
 		else
 			if ny == my.Y then
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny,nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					if my.x == nx then
@@ -2403,7 +2416,7 @@ function is_jump() as Boolean{
 						end if
 				end if
 			elseif nx == my.X then
-				if check_void(nx,ny ,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny ,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					if my.y == ny then
@@ -2413,7 +2426,7 @@ function is_jump() as Boolean{
 						end if
 				end if
 			else
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny+1,nz - my.normal_vector(2)) == 1  then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny+f(1),nz - my.normal_vector(2)) == 1  then
 					ret = false
 				else
 					ret = true
@@ -2425,7 +2438,7 @@ function is_jump() as Boolean{
 			ret = false
 		else
 			if nz == my.z then
-				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz) == 1 then
+				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+f(0),ny- my.normal_vector(1),nz) == 1 then
 					ret = false
 				else
 					if my.x == nx then
@@ -2435,7 +2448,7 @@ function is_jump() as Boolean{
 						end if
 				end if
 			elseif nx == my.X then
-				if check_void(nx,ny- my.normal_vector(1) ,nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+1) == 1 then
+				if check_void(nx,ny- my.normal_vector(1) ,nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+f(2)) == 1 then
 					ret = false
 				else
 					if my.Z == nz then
@@ -2445,7 +2458,7 @@ function is_jump() as Boolean{
 						end if
 				end if
 			else
-				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+1) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz+1) == 1  then
+				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+f(0),ny- my.normal_vector(1),nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+f(2)) == 1 and check_void(nx+f(0),ny- my.normal_vector(1),nz+f(2)) == 1  then
 					ret = false
 				else
 					ret = true
@@ -2457,7 +2470,7 @@ function is_jump() as Boolean{
 			if nz == 0 and my.normal_vector(2) > 0 then
 				ret = false
 			else
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					if my.y == ny then
@@ -2471,7 +2484,7 @@ function is_jump() as Boolean{
 			if nx == 0 and my.normal_vector(0) > 0 then
 				ret = false
 			else
-				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny+1,nz) == 1 then
+				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny+f(1),nz) == 1 then
 					ret = false
 				else
 					if my.y == ny then
@@ -2487,7 +2500,7 @@ function is_jump() as Boolean{
 			ret = false
 		else
 			if nz == my.z then
-				if check_void(nx- my.normal_vector(0),ny,nz)==1 and check_void(nx- my.normal_vector(0),ny+1,nz) == 1 then
+				if check_void(nx- my.normal_vector(0),ny,nz)==1 and check_void(nx- my.normal_vector(0),ny+f(1),nz) == 1 then
 					ret = false
 				else
 					if my.y == ny then
@@ -2497,7 +2510,7 @@ function is_jump() as Boolean{
 						end if
 				end if
 			elseif ny == my.y then
-				if check_void(nx- my.normal_vector(0),ny ,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+1) == 1 then
+				if check_void(nx- my.normal_vector(0),ny ,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+f(2)) == 1 then
 					ret = false
 				else
 					if my.Z == nz then
@@ -2507,7 +2520,7 @@ function is_jump() as Boolean{
 						end if
 				end if
 			else
-				if check_void(nx- my.normal_vector(0),ny,nz) == 1 and check_void(nx- my.normal_vector(0),ny+1,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+1) == 1 and check_void(nx- my.normal_vector(0),ny+1,nz+1) == 1  then
+				if check_void(nx- my.normal_vector(0),ny,nz) == 1 and check_void(nx- my.normal_vector(0),ny+f(1),nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+f(2)) == 1 and check_void(nx- my.normal_vector(0),ny+f(1),nz+f(2)) == 1  then
 					ret = false
 				else
 					ret = true
@@ -2519,7 +2532,7 @@ function is_jump() as Boolean{
 			if ny == 0 and my.normal_vector(1) > 0 then
 				ret = false
 			else
-				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx,ny - my.normal_vector(1),nz+1) == 1 then
+				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx,ny - my.normal_vector(1),nz+f(2)) == 1 then
 					ret = false
 				else
 					if my.Z == nz then
@@ -2533,7 +2546,7 @@ function is_jump() as Boolean{
 			if nx == 0 and my.normal_vector(0) > 0 then
 				ret = false
 			else
-				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny,nz+1) == 1 then
+				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny,nz+f(2)) == 1 then
 					ret = false
 				else
 					if my.Z == nz then
