@@ -815,8 +815,9 @@ function is_disappear_surface() as Boolean{
 			end if
 		end if
 	end if
-
+	
 	return ret
+
 }
 
 sub jump_new_surface(){
