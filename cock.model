@@ -888,6 +888,7 @@ sub jump_new_surface(){
 	my.ap_or_dis = -1
 	
 	if n == 0 then
+		matrix()
 		my.X = my.X - pre(0)
 		my.Y = my.Y + f(1)
 		my.Z = my.Z + f(2)
@@ -896,6 +897,7 @@ sub jump_new_surface(){
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
 			my.touch(0) = 0
+			my.touch(1) = my.touch(1)
 			my.touch(2) = my.normal_vector(2)
 		else
 			my.normal_vector(0) = 0
@@ -903,9 +905,11 @@ sub jump_new_surface(){
 			my.normal_vector(2) = 0
 			my.touch(0) = 0
 			my.touch(1) = my.normal_vector(1)
+			my.touch(2) = my.touch(2)
 		end if
 		back_surface(0)
 	elseif n == 1 then
+		matrix()
 		my.X = my.X + f(0)
 		my.Y = my.Y - pre(1)
 		my.Z = my.Z + f(2)
@@ -913,12 +917,14 @@ sub jump_new_surface(){
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
+			my.touch(0) = my.touch(0)
 			my.touch(1) = 0
 			my.touch(2) = my.normal_vector(2)
 		else
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
+			my.touch(2) = my.touch(2)
 			my.touch(1) = 0
 			my.touch(0) = my.normal_vector(0)
 		end if
@@ -927,11 +933,13 @@ sub jump_new_surface(){
 		my.X = my.X + f(0)
 		my.Y = my.Y + f(1)
 		my.Z = my.Z - pre(2)
+		matrix()
 		if b == 1 then
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
 			my.touch(2) = 0
+			my.touch(1) = my.touch(1)
 			my.touch(0) = my.normal_vector(0)
 		else
 			my.normal_vector(0) = 0
@@ -939,13 +947,13 @@ sub jump_new_surface(){
 			my.normal_vector(2) = 0
 			my.touch(2) = 0
 			my.touch(1) = my.normal_vector(1)
+			my.touch(0) = my.touch(0)
 		end if
 		back_surface(2)
 	end if
 	back_0()
 	if not my.is_back then
 		println("back‚ª‚Î‚®‚Á‚Ä‚é")
-		matrix()
 		update_touch()
 		My.is_back = false
 	end if	
@@ -2364,6 +2372,13 @@ function is_jump() as Boolean{
 	nx = Int(my.X)
 	ny = Int(my.Y)
 	nz = Int(my.Z)
+
+	println("X : "&my.X)
+	println("Y : "&my.Y)
+	println("Z : "&my.Z)
+	println("nX : "&nX)
+	println("nY : "&nY)
+	println("nZ : "&nZ)
 
 	if my.X == nx then
 		f(0) = 0 
