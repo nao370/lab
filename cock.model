@@ -715,10 +715,12 @@ sub jump_new_surface(){
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
+			my.touch(2) = my.normal_vector(2)
 		else
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
+			my.touch(1) = my.normal_vector(1)
 		end if
 		back_surface(0)
 	elseif n == 1 then
@@ -729,10 +731,12 @@ sub jump_new_surface(){
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
+			my.touch(2) = my.normal_vector(2)
 		else
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
+			my.touch(0) = my.normal_vector(0)
 		end if
 		back_surface(1)
 	else
@@ -743,12 +747,13 @@ sub jump_new_surface(){
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
+			my.touch(0) = my.normal_vector(0)
 		else
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
+			my.touch(1) = my.normal_vector(1)
 		end if
-
 		back_surface(2)
 	end if
 	back_0()
