@@ -4,7 +4,7 @@
 //                                                                    /
 //====================================================================/
 
-Version = 4.0;
+Version = 4.2;
 
 
 
@@ -1440,6 +1440,7 @@ sub along_wall(){
 		 for i = 0 to 2
 		 	if i == n then
 		 		my.forward_vector(i) =  my.touch(n)
+		 		my.touch(n) = 0
 		 	else
 		 		my.forward_vector(i) = 0
 		 	end if
@@ -2868,4 +2869,139 @@ Window_Rectangle {
 // Help Favorite Division
 //-------------------------------------------------------
 Help_Favorite {
+}
+
+
+//-------------------------------------------------------
+// Model Description Division
+//-------------------------------------------------------
+Model_Description {
+    Universe {
+        Function Univ_Init {
+        }
+        Function read_barrier {
+        }
+        Function write_parameter {
+        }
+        Function make_void {
+        }
+        Function Univ_Step_Begin {
+        }
+        Function Univ_Step_End {
+        }
+        Function write_csv {
+        }
+        Function Univ_Finish {
+        }
+        Function make_rubble_mix {
+        }
+        Function make_rubble_board {
+        }
+        Function make_rubble_box {
+        }
+        Function make_rubble_Pillar {
+        }
+    }
+    Space Universe.map {
+    }
+    Agent Universe.map.insect {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+        Function is_disappear_surface {
+        }
+        Function jump_new_surface {
+        }
+        Function move_new_surface {
+        }
+        Function update_normal_vector {
+        }
+        Function calculate_theta {
+        }
+        Function matrix {
+        }
+        Function get_boundary {
+        }
+        Function update_touch {
+        }
+        Function back_surface {
+        }
+        Function prev_forward {
+        }
+        Function is_touch_new_surface {
+        }
+        Function do_peripheral {
+        }
+        Function along_wall {
+        }
+        Function empty_direction {
+        }
+        Function invade_central_zone {
+        }
+        Function decision_invade_angle {
+        }
+        Function touch_signal {
+        }
+        Function angle_invade {
+        }
+        Function normal_num {
+        }
+        Function is_stop_do_peripheral {
+        }
+        Function in_central {
+        }
+        Function decide_direction_and_distance {
+        }
+        Function Create_steps_of_random_walk {
+        }
+        Function distribution_time_of_random_walk {
+        }
+        Function do_stop {
+        }
+        Function do_central {
+        }
+        Function forward_one_step {
+        }
+        Function stop_insect {
+        }
+        Function Create_stop_time {
+        }
+        Function distribution_stop_time {
+        }
+        Function is_stop_central {
+        }
+        Function step_direction {
+        }
+        Function delete_touch_vector {
+        }
+        Function update_do_type {
+        }
+        Function update_normal {
+        }
+        Function is_step {
+        }
+        Function is_filled {
+        }
+        Function is_float {
+        }
+        Function back_step {
+        }
+        Function back_0 {
+        }
+        Function is_pause {
+        }
+        Function is_jump {
+        }
+        Function close_num {
+        }
+        Function check_void {
+        }
+    }
+    Agent Universe.map.barrier {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+    }
 }
