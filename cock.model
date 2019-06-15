@@ -532,7 +532,9 @@ Agt_Step{
 	for i = 0 to 2
 		println("touch ("&i&") : "&my.touch(i))
 	next i
-	
+		for i = 0 to 2
+		println("pre_touch ("&i&") : "&my.pre_touch(i))
+	next i
 	if my.state == COLOR_BLUE then
 		do_stop()
 	else
