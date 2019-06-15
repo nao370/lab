@@ -545,7 +545,7 @@ Agt_Step{
 		else
 			my.state = COLOR_BLACK
 			if is_touch_new_surface() then
-				if Rnd() < 0.5 then
+				if Rnd() < 0.2 then
 					println("move")
 					move_new_surface()
 				else
@@ -556,7 +556,7 @@ Agt_Step{
 					do_peripheral()
 				end if
 			elseif is_disappear_surface() then
-				if Rnd() < 0.5 then
+				if Rnd() < 0.2 then
 				println("jump")
 					jump_new_surface()
 				else
@@ -677,6 +677,7 @@ sub jump_new_surface(){
 		println("touch(:"&i&") : "&my.touch(i) )
 	next i
 	
+	n = -1
 	for i = 0 to 2
 		pre(i) = my.pre_touch(i)
 		my.pre_touch(i) = my.touch(i)
@@ -685,6 +686,14 @@ sub jump_new_surface(){
 		end if
 	next i
 
+	//--------------------------------------------------------------------------------------“K“–ˆ’u
+	if n == -1 then
+		for i = 0 to 2
+			my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
+		next i
+	end if
+
+	
 	b = my.b_type
 	println(" b = "&b&"   n = "&n)
 	
@@ -715,11 +724,13 @@ sub jump_new_surface(){
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
+			my.touch(0) = 0
 			my.touch(2) = my.normal_vector(2)
 		else
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
+			my.touch(0) = 0
 			my.touch(1) = my.normal_vector(1)
 		end if
 		back_surface(0)
@@ -731,11 +742,13 @@ sub jump_new_surface(){
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
+			my.touch(1) = 0
 			my.touch(2) = my.normal_vector(2)
 		else
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
+			my.touch(1) = 0
 			my.touch(0) = my.normal_vector(0)
 		end if
 		back_surface(1)
@@ -747,11 +760,13 @@ sub jump_new_surface(){
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
+			my.touch(2) = 0
 			my.touch(0) = my.normal_vector(0)
 		else
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
+			my.touch(2) = 0
 			my.touch(1) = my.normal_vector(1)
 		end if
 		back_surface(2)
@@ -841,6 +856,7 @@ function calculate_theta() as Double{
 	dim jud as Double
 	dim f as Double
 
+	n = 1
 	for i = 0 to 2
 		if my.normal_vector(i) != 0 then
 			n = my.normal_vector(i)//³‚©‚ç‚Ó‚ê‚Ä‚é‚©‚Ç‚¤‚©
@@ -873,9 +889,11 @@ function calculate_theta() as Double{
 			f = -my.forward_vector(0)
 		else
 			println("miss in theta3")
+			f = 1
 		end if
 	else
 		println("miss in theta4")
+		f = 1
 	end if
 
 	jud = f * n * my.ap_or_dis
@@ -1180,7 +1198,7 @@ sub prev_forward(){
 }
 
 
-function is_touch_new_surface()as Boolean{
+function is_touch_new_surface() as Boolean{
 
 /*
 V‚µ‚¢–Ê‚ÉG‚ê‚Ä‚¢‚½‚çtrue,U‚ê‚Ä‚¢‚È‚¯‚ê‚Îfalse‚ð•Ô‚·
@@ -1191,7 +1209,7 @@ function is_touch_new_surface()as Boolean{
 	ret = false
 
 	for i = 0 to 2
-		if my.touch(i) != 0 and my.pre_touch(i) != my.touch(i) then
+		if my.touch(i) != 0 and my.pre_touch(i) != my.touch(i) and my.normal_vector(i) == 0 then
 			ret = true
 		end if
 	next i
@@ -1235,7 +1253,7 @@ sub along_wall(){
 		else
 			my.do_type = 5
 		end if
-	 println("n is "&n&" in along wall")
+			 println("n is "&n&" in along wall")
 	 if my.touch(n) == 0 then
 		 for i = 0 to 2
 		 	if i == n and my.forward_vector(i) == 0 then
@@ -1476,7 +1494,7 @@ sub do_stop() {
 //’âŽ~ó‘Ô‚Å‚Ç‚¤“®‚­‚©
 	if my.stop_time > 0 then
 		my.stop_time = my.stop_time - 1
-//		println("my.stop_time :"&my.stop_time)
+		println("my.stop_time :"&my.stop_time)
 	else
 		my.state = COLOR_BLACK
 	end if
