@@ -709,19 +709,47 @@ sub jump_new_surface(){
 		my.X = my.X - pre(0)
 		my.Y = my.Y + f(1)
 		my.Z = my.Z + f(2)
+		if b == 1 then
+			my.normal_vector(0) = 0
+			my.normal_vector(1) = 0
+			my.normal_vector(2) = -pre(2)
+		else
+			my.normal_vector(0) = 0
+			my.normal_vector(1) = -pre(1)
+			my.normal_vector(2) = 0
+		end if
 		back_surface(0)
 	elseif n == 1 then
 		my.X = my.X + f(0)
 		my.Y = my.Y - pre(1)
 		my.Z = my.Z + f(2)
+		if b == 0 then
+			my.normal_vector(0) = 0
+			my.normal_vector(1) = 0
+			my.normal_vector(2) = -pre(2)
+		else
+			my.normal_vector(0) = -pre(0)
+			my.normal_vector(1) = 0
+			my.normal_vector(2) = 0
+		end if
 		back_surface(1)
 	else
 		my.X = my.X + f(0)
 		my.Y = my.Y + f(1)
 		my.Z = my.Z - pre(2)
+		if b == 1 then
+			my.normal_vector(0) = -pre(0)
+			my.normal_vector(1) = 0
+			my.normal_vector(2) = 0
+		else
+			my.normal_vector(0) = 0
+			my.normal_vector(1) = -pre(1)
+			my.normal_vector(2) = 0
+		end if
+
 		back_surface(2)
 	end if
-		back_0()
+	back_0()
 	if not my.is_back then
 		matrix()
 		update_touch()
@@ -1193,6 +1221,13 @@ sub along_wall(){
 	dim i as Integer
 	
 	 n = empty_direction()
+	 if n == 0 then
+		 my.do_type = 0
+		elseif n == 1 then
+			my.do_type = 3
+		else
+			my.do_type = 5
+		end if
 	 println("n is "&n&" in along wall")
 	 if my.touch(n) == 0 then
 		 for i = 0 to 2
