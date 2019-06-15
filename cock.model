@@ -96,7 +96,7 @@ Univ_Init{
 	CreateAgtMulti(universe.map.insect,universe.num_insect)
 	ClearConsoleScreen()
 	//make_rubble_mix(0.6)
-	//read_barrier()
+	read_barrier()
 	//make_void()
 	println("")
 	println("start")
@@ -515,8 +515,8 @@ My.pre_touch(2) = 1
 my.touch(2) = 1
 my.dis_surface = -1
 my.edge_flag = false
-my.X = 200//1 + rnd() *0.5
-my.Y = 200//1 + rnd() *0.5
+my.X = 1 + rnd() *0.5
+my.Y = 1 + rnd() *0.5
 my.Z = 0
 my.T_al = Int(Rnd()*10)
 my.state = COLOR_BLACK
@@ -1040,7 +1040,7 @@ sub update_touch() {
 			my.touch(2) = -1
 		end if
 	else
-		if grid(2) + f(2) < 0 then
+		if grid(2) + f(2) < 0 and my.Z == 0 then
 			my.touch(2) = 1
 		elseif grid(2) + f(2) > 39 then
 			my.touch(2) = -1
