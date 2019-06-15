@@ -552,20 +552,22 @@ Agt_Step{
 					for i = 0 to 2
 						my.pre_touch(i) = my.touch(i)
 					next i
+									println("do_peripheral 1")
 					do_peripheral()
 				end if
 			elseif is_disappear_surface() then
 				if Rnd() < 0.5 then
-//				println("jump")
+				println("jump")
 					jump_new_surface()
 				else
 					for i = 0 to 2
 						my.pre_touch(i) = my.touch(i)
 					next i
+									println("do_peripheral 2")
 					do_peripheral()
 				end if
 			else
-				println("do_peripheral")
+				println("do_peripheral    3")
 				do_peripheral()
 			end if
 		end if
@@ -712,10 +714,10 @@ sub jump_new_surface(){
 		if b == 1 then
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
-			my.normal_vector(2) = -pre(2)
+			my.normal_vector(2) = f(2)
 		else
 			my.normal_vector(0) = 0
-			my.normal_vector(1) = -pre(1)
+			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
 		end if
 		back_surface(0)
@@ -726,9 +728,9 @@ sub jump_new_surface(){
 		if b == 0 then
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
-			my.normal_vector(2) = -pre(2)
+			my.normal_vector(2) = f(2)
 		else
-			my.normal_vector(0) = -pre(0)
+			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
 		end if
@@ -738,12 +740,12 @@ sub jump_new_surface(){
 		my.Y = my.Y + f(1)
 		my.Z = my.Z - pre(2)
 		if b == 1 then
-			my.normal_vector(0) = -pre(0)
+			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
 		else
 			my.normal_vector(0) = 0
-			my.normal_vector(1) = -pre(1)
+			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
 		end if
 
@@ -2575,8 +2577,8 @@ Others_Data {
     Debug_Size_y = 200;
     Console_Position_x = 2;
     Console_Position_y = -11;
-    Console_Size_x = 330;
-    Console_Size_y = 642;
+    Console_Size_x = 360;
+    Console_Size_y = 737;
     Componen_Tree_Position_x = -24;
     Componen_Tree_Position_y = -3;
     Componen_Tree_Size_x = 250;
