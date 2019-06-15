@@ -4,7 +4,7 @@
 //                                                                    /
 //====================================================================/
 
-Version = 4.0;
+Version = 4.2;
 
 
 
@@ -96,7 +96,7 @@ Univ_Init{
 	CreateAgtMulti(universe.map.insect,universe.num_insect)
 	ClearConsoleScreen()
 	//make_rubble_mix(0.6)
-	read_barrier()
+	//read_barrier()
 	//make_void()
 	println("")
 	println("start")
@@ -515,8 +515,8 @@ My.pre_touch(2) = 1
 my.touch(2) = 1
 my.dis_surface = -1
 my.edge_flag = false
-my.X = 1 + rnd() *0.5
-my.Y = 1 + rnd() *0.5
+my.X = 200//1 + rnd() *0.5
+my.Y = 200//1 + rnd() *0.5
 my.Z = 0
 my.T_al = Int(Rnd()*10)
 my.state = COLOR_BLACK
@@ -1370,6 +1370,7 @@ sub decide_direction_and_distance(){
 	end if
 
 	my.time_of_randomwalk = Create_steps_of_random_walk()
+	My.state = COLOR_RED
 	
 }
 
@@ -1425,11 +1426,18 @@ dim i as Integer
 
 	if is_stop_central() then
 		stop_insect()
+		my.time_of_randomwalk = 0
 	else
 		if my.state != COLOR_RED then
 			decide_direction_and_distance()
 		end if
 		forward_one_step()
+		if my.time_of_randomwalk > 0 then
+			my.time_of_randomwalk = my.time_of_randomwalk - 1
+		else
+			my.time_of_randomwalk = 0
+			my.state = COLOR_BLACK
+		end if
 	end if
 }
 
@@ -2422,7 +2430,7 @@ Map_Output {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 0, 0, 420, 116;
+    Display_Area = 0, 0, 416, 107;
     Display_Type = 1;
     Panel_Item {
         Item_Type = Edit_Box;
@@ -2546,7 +2554,7 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -11, -11, 1942, 1042;
+    Window_Name = Main_Window, -9, -9, 2578, 1408;
     Window_Name = Output_Setting_Window, 1064, 529, 480, 350;
     Window_Name = Artisoc_Help_Window, 10, 10, 730, 732;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
@@ -2558,4 +2566,137 @@ Window_Rectangle {
 // Help Favorite Division
 //-------------------------------------------------------
 Help_Favorite {
+}
+
+
+//-------------------------------------------------------
+// Model Description Division
+//-------------------------------------------------------
+Model_Description {
+    Universe {
+        Function Univ_Init {
+        }
+        Function read_barrier {
+        }
+        Function write_parameter {
+        }
+        Function make_void {
+        }
+        Function Univ_Step_Begin {
+        }
+        Function Univ_Step_End {
+        }
+        Function write_csv {
+        }
+        Function Univ_Finish {
+        }
+        Function make_rubble_mix {
+        }
+        Function make_rubble_board {
+        }
+        Function make_rubble_box {
+        }
+        Function make_rubble_Pillar {
+        }
+    }
+    Space Universe.map {
+    }
+    Agent Universe.map.insect {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+        Function is_disappear_surface {
+        }
+        Function jump_new_surface {
+        }
+        Function move_new_surface {
+        }
+        Function update_normal_vector {
+        }
+        Function calculate_theta {
+        }
+        Function matrix {
+        }
+        Function get_boundary {
+        }
+        Function update_touch {
+        }
+        Function back_surface {
+        }
+        Function prev_forward {
+        }
+        Function is_touch_new_surface {
+        }
+        Function do_peripheral {
+        }
+        Function along_wall {
+        }
+        Function empty_direction {
+        }
+        Function invade_central_zone {
+        }
+        Function decision_invade_angle {
+        }
+        Function touch_signal {
+        }
+        Function angle_invade {
+        }
+        Function normal_num {
+        }
+        Function is_stop_do_peripheral {
+        }
+        Function in_central {
+        }
+        Function decide_direction_and_distance {
+        }
+        Function Create_steps_of_random_walk {
+        }
+        Function distribution_time_of_random_walk {
+        }
+        Function do_stop {
+        }
+        Function do_central {
+        }
+        Function forward_one_step {
+        }
+        Function stop_insect {
+        }
+        Function Create_stop_time {
+        }
+        Function distribution_stop_time {
+        }
+        Function is_stop_central {
+        }
+        Function step_direction {
+        }
+        Function delete_touch_vector {
+        }
+        Function update_normal {
+        }
+        Function is_step {
+        }
+        Function is_filled {
+        }
+        Function is_float {
+        }
+        Function back_step {
+        }
+        Function back_0 {
+        }
+        Function is_pause {
+        }
+        Function is_jump {
+        }
+        Function close_num {
+        }
+        Function check_void {
+        }
+    }
+    Agent Universe.map.barrier {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+    }
 }
