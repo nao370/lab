@@ -853,7 +853,8 @@ sub jump_new_surface(){
 	
 	n = -1
 	for i = 0 to 2
-		pre(i) = my.pre_touch(i)
+//		pre(i) = my.pre_touch(i)
+		pre(i) = my.touch(i) // Ç±ÇÍÇ≈Ç¶Ç¶ÇÃÇ©Ç»ÅH
 		my.pre_touch(i) = my.touch(i)
 		if my.normal_vector(i) != 0 then
 			n = i
@@ -2360,17 +2361,25 @@ function is_jump() as Boolean{
 	dim i as Integer
 	dim f(3) as Integer
 
-	nx = close_num(my.X)//Int(my.X)
-	ny = close_num(my.Y)//Int(my.Y)
-	nz = close_num(my.Z)//Int(my.Z)
+	nx = Int(my.X)
+	ny = Int(my.Y)
+	nz = Int(my.Z)
 
-	for i =0 to 2
-		f(i) = my.forward_vector(i)
-		if f(i) != 0 then
-			f(i) = f(i) / Abs(f(i))
-		end if
-		println("f("&i&") : "&f(i)&"     in is_jump")
-	next i
+	if my.X == nx then
+		f(0) = 0 
+	else
+		f(0) = 1
+	end if
+	if my.Y == ny then
+		f(1) = 0 
+	else
+		f(1) = 1
+	end if
+	if my.Z == nz then
+		f(2) = 0 
+	else
+		f(2) = 1
+	end if
 	
 	type = my.do_type
 	println("do_type :"&my.do_type)
