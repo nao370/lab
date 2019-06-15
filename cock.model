@@ -531,6 +531,7 @@ Agt_Step{
 	for i = 0 to 2
 		println("       touch ("&i&") : "&my.touch(i))
 	next i
+	println(GetCountStep())
 		ExitSimulation()
 	end if
 	println("X is "&my.X)
@@ -674,12 +675,25 @@ function is_disappear_surface() as Boolean{
 	dim ret as Boolean
 	dim nx as Integer
 	dim ny as Integer
+	dim i as Integer
+	dim f(3) as Integer
 	dim nz as Integer
 
-	nx = Int(my.X)
-	ny = Int(my.Y)
-	nz = Int(my.Z)
+	nx = close_num(my.X)//Int(my.X)
+	ny = close_num(my.Y)//Int(my.Y)
+	nz = close_num(my.Z)//Int(my.Z)
 	type = my.do_type
+
+
+	for i = 0 to 2
+		if my.forward_vector(i) < 0 then
+			f(i) = -1
+		elseif my.forward_vector(i) > 0 then
+			f(i) = 1
+		else
+			f(i) = 0
+		end if
+	next i
 
 	ret = false
 	if type == 0 then
@@ -687,7 +701,7 @@ function is_disappear_surface() as Boolean{
 			if nz == 0 and my.normal_vector(2) > 0 then
 				ret = false
 			else
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny,nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -698,7 +712,7 @@ function is_disappear_surface() as Boolean{
 			if ny == 0 and my.normal_vector(1) > 0 then
 				ret = false
 			else
-				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx+1,ny - my.normal_vector(1),nz) == 1 then
+				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx+f(0),ny - my.normal_vector(1),nz) == 1 then
 					ret = false
 				else
 					ret = true
@@ -711,14 +725,14 @@ function is_disappear_surface() as Boolean{
 			ret = false
 		else
 			if ny == my.Y then
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+1,ny,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny,nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					ret = true
 					My.b_type = 0
 				end if
 			elseif nx == my.X then
-				if check_void(nx,ny ,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny ,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -731,14 +745,14 @@ function is_disappear_surface() as Boolean{
 			ret = false
 		else
 			if nz == my.z then
-				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+1,ny- my.normal_vector(1),nz) == 1 then
+				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+f(0),ny- my.normal_vector(1),nz) == 1 then
 					ret = false
 				else
 					ret = true
 					My.b_type = 0
 				end if
 			elseif nx == my.X then
-				if check_void(nx,ny- my.normal_vector(1) ,nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+1) == 1 then
+				if check_void(nx,ny- my.normal_vector(1) ,nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+f(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -751,7 +765,7 @@ function is_disappear_surface() as Boolean{
 			if nz == 0 and my.normal_vector(2) > 0 then
 				ret = false
 			else
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+1,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -762,7 +776,7 @@ function is_disappear_surface() as Boolean{
 			if nx == 0 and my.normal_vector(0) > 0 then
 				ret = false
 			else
-				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny+1,nz) == 1 then
+				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny+f(1),nz) == 1 then
 					ret = false
 				else
 					ret = true
@@ -775,14 +789,14 @@ function is_disappear_surface() as Boolean{
 			ret = false
 		else
 			if nz == my.z then
-				if check_void(nx- my.normal_vector(0),ny,nz)==1 and check_void(nx- my.normal_vector(0),ny+1,nz) == 1 then
+				if check_void(nx- my.normal_vector(0),ny,nz)==1 and check_void(nx- my.normal_vector(0),ny+f(1),nz) == 1 then
 					ret = false
 				else
 					ret = true
 					My.b_type = 1
 				end if
 			elseif ny == my.y then
-				if check_void(nx- my.normal_vector(0),ny ,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+1) == 1 then
+				if check_void(nx- my.normal_vector(0),ny ,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+f(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -795,7 +809,7 @@ function is_disappear_surface() as Boolean{
 			if ny == 0 and my.normal_vector(1) > 0 then
 				ret = false
 			else
-				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx,ny - my.normal_vector(1),nz+1) == 1 then
+				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx,ny - my.normal_vector(1),nz+f(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -806,7 +820,7 @@ function is_disappear_surface() as Boolean{
 			if nx == 0 and my.normal_vector(0) > 0 then
 				ret = false
 			else
-				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny,nz+1) == 1 then
+				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny,nz+f(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -833,6 +847,9 @@ sub jump_new_surface(){
 	for i = 0 to 2
 		println("touch(:"&i&") : "&my.touch(i) )
 	next i
+	println("x "&my.X)
+	println("y "&my.Y)
+	println("z "&my.Z)
 	
 	n = -1
 	for i = 0 to 2
@@ -842,14 +859,6 @@ sub jump_new_surface(){
 			n = i
 		end if
 	next i
-
-	//--------------------------------------------------------------------------------------ìKìñèàíu
-	if n == -1 then
-		for i = 0 to 2
-			my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
-		next i
-	end if
-
 	
 	b = my.b_type
 	println(" b = "&b&"   n = "&n)
@@ -930,6 +939,7 @@ sub jump_new_surface(){
 	end if
 	back_0()
 	if not my.is_back then
+		println("backÇ™ÇŒÇÆÇ¡ÇƒÇÈ")
 		matrix()
 		update_touch()
 		My.is_back = false
@@ -1482,8 +1492,9 @@ sub decision_invade_angle(){
 	y = my.forward_vector(1)
 	z = my.forward_vector(2)
 	n = normal_num()
+	println(" n (invade_angle) :"&n)
 	t = touch_signal(n)
-	theta = DegreeToRad(angle_invade()) * t
+	theta = DegreeToRad(angle_invade()) * t * (-1)
 
 	if n == 0 then
 		my.forward_vector(1) = Cos(theta) * y - Sin(theta) * z
