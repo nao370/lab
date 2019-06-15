@@ -4,7 +4,7 @@
 //                                                                    /
 //====================================================================/
 
-Version = 4.0;
+Version = 4.2;
 
 
 
@@ -79,7 +79,7 @@ UNIVERSE {
 // Agent Variable Initial Data
 //-------------------------------------------------------
 Initial_Value {
-    UNIVERSE.NUM_INSECT = 1(100);
+    UNIVERSE.NUM_INSECT = 1(1);
     UNIVERSE.T = 1(100);
     UNIVERSE.ALPHA = 1(0.6);
     UNIVERSE.RUBBLE_RATE = 1(0.6);
@@ -531,8 +531,200 @@ Agt_Step{
 		my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
 	next i
 	end if
-	cock_move()
+	if is_control() then
+		calculate_repulsive()
+		decide_vector()
+		forward_one_step()
+	else
+		cock_move()
+	end if
 	back_0()
+}
+sub calculate_repulsive(){
+	repulsive_insect()
+	repulsive_barrier()
+	sum_repulsive()
+}
+sub sum_repulsive(){
+//repulsiveの合計を出す
+	dim i as Integer
+	dim alpha as Double
+
+	alpha = universe.alpha
+
+	for i = 0 to 2
+		my.repulsive_vector(2,i) = alpha * my.repulsive_vector(0,i) + (1 - alpha) * my.repulsive_vector(1,i)
+	next i
+}
+
+sub repulsive_insect(){
+//サイボーグインセクトからの斥力の和を計算
+	dim neighbor as AgtSet
+	dim r as Double
+	dim diff(3) as Double
+	dim d as Double
+	dim i as Integer
+	dim sum as Double
+
+	r = 50
+	MakeOneAgtSetAroundOwn(neighbor,r,universe.map.insect,false)
+	if CountAgtSet(neighbor) > 0 then
+		for Each one in neighbor 
+			diff(0) = my.X - one.X + NormInv(Rnd()*0.8+0.1,0,3)
+			diff(1) = my.Y - one.Y+ NormInv(Rnd()*0.8+0.1,0,3)
+			diff(2) = my.Z - one.Z+ NormInv(Rnd()*0.8+0.1,0,3)
+			d = Sqr(diff(0)^2 + diff(1)^2 + diff(2)^2) / r
+
+			if d != 0 then
+				for i = 0 to 2
+					my.repulsive_vector(0,i) = my.repulsive_vector(0,i) + diff(i) / d ^ 2
+				next i
+			end if
+		next one
+
+		d = Sqr(my.repulsive_vector(0,0)^2 + my.repulsive_vector(0,1)^2 + my.repulsive_vector(0,2)^2)
+		if d != 0 then
+			for i = 0 to 2
+				my.repulsive_vector(0,i) = my.repulsive_vector(0,i)/d
+			next i
+		end if
+		my.vector_cul(0) = d
+	end if
+}
+
+sub repulsive_barrier(){
+//障害物からの斥力の和を計算
+	dim objectset as AgtSet
+	dim r as Double
+	dim normal as Integer
+	dim diff(3) as Double
+	dim d as Double
+	dim n as Integer
+	dim i as Integer
+	dim j as Integer
+	dim k as Integer
+	dim position(3) as Integer
+
+	r = 2
+	n = get_surface()
+
+	position(0) = my.X
+	position(1) = my.Y
+	position(2) = my.Z
+	
+	if n == 0 then
+		for i = 0 to 4
+			for j = 0 to 4
+				if check_void(position(0),position(1) - 2 + i ,position(2) - 2 + j) then
+					diff(0) = 0
+					diff(1) = my.Y - position(1) - 2 + i
+					diff(2) = my.Z - position(2) - 2 + j
+
+					d = Sqr(diff(0)^2 + diff(1)^2 + diff(2)^2) / r
+					if d != 0 then
+						for k = 0 to 2
+							my.repulsive_vector(1,k) = my.repulsive_vector(1,k) + diff(k) / d ^ 3
+						next k
+					end if
+				end if	
+			next j
+		next i
+	elseif n == 1 then
+		for i = 0 to 4
+			for j = 0 to 4
+				if check_void(position(0) - 2 + i,position(1),position(2) - 2 + j) then
+					diff(0) = my.X - position(0) - 2 + i
+					diff(1) = 0
+					diff(2) = my.Z - position(2) - 2 + j
+
+					d = Sqr(diff(0)^2 + diff(1)^2 + diff(2)^2) / r
+					if d != 0 then
+						for k = 0 to 2
+							my.repulsive_vector(1,k) = my.repulsive_vector(1,k) + diff(k) / d ^ 3
+						next k
+					end if
+				end if	
+			next j
+		next i
+	elseif n == 2 then
+		for i = 0 to 4
+			for j = 0 to 4
+				if check_void(position(0) - 2 + i,position(1) - 2 + j,position(2)) then
+					diff(0) = my.X - position(0) - 2 + i
+					diff(1) = my.Y - position(1) - 2 + j
+					diff(2) = 0
+
+					d = Sqr(diff(0)^2 + diff(1)^2 + diff(2)^2) / r
+					if d != 0 then
+						for k = 0 to 2
+							my.repulsive_vector(1,k) = my.repulsive_vector(1,k) + diff(k) / d ^ 3
+						next k
+					end if
+				end if	
+			next j
+		next i
+	else
+		PrintLn("miss in repulsive barrier")
+		terminateagt(my)
+	end if
+
+	d = Sqr(my.repulsive_vector(1,0)^2 + my.repulsive_vector(1,1)^2 + my.repulsive_vector(1,2)^2)
+		if d != 0 then
+			for i = 0 to 2
+				my.repulsive_vector(1,i) = my.repulsive_vector(1,i)/d
+			next i
+		end if
+		my.vector_cul(1) = d
+}
+
+function get_surface()as Integer{
+	dim ret as Integer
+	dim i as Integer
+
+	ret = 0
+	for i = 0 to 2
+		if my.normal_vector(i) != 0 then
+			ret = i
+			break
+		end if
+	next i
+
+	return ret
+}
+
+sub decide_vector(){
+//斥力から今の垂直な成分を削除
+	dim n as Integer
+	dim i as Integer
+	dim length as Double
+
+	n = get_surface()
+	length = 0
+	my.repulsive_vector(2,n) = 0 
+
+	for i = 0 to 2
+		length = length + my.repulsive_vector(2,i)^2
+	next i 
+	length = Sqr(length)
+	if length != 0 then
+		for i = 0 to 2
+			my.forward_vector(i) = my.repulsive_vector(2,i) / length
+		next i 
+	end if
+
+	update_do_type()
+}
+
+function is_control() as Boolean{
+	dim ret as Boolean
+
+	if (GetCountStep() mod universe.T) == my.T_al then
+		ret = true
+	else
+		ret = false
+	end if
+
+	return ret
 }
 
 sub cock_move(){
@@ -2767,7 +2959,7 @@ Control_Panel {
         Font_Color = 0, 0, 0;
         Font_Background_Color = 0, 0, 0;
         Var_Name = "Universe.num_insect";
-        Text_Data = "100";
+        Text_Data = "1";
     }
     Panel_Item {
         Item_Type = Edit_Box;
@@ -2877,4 +3069,155 @@ Window_Rectangle {
 // Help Favorite Division
 //-------------------------------------------------------
 Help_Favorite {
+}
+
+
+//-------------------------------------------------------
+// Model Description Division
+//-------------------------------------------------------
+Model_Description {
+    Universe {
+        Function Univ_Init {
+        }
+        Function read_barrier {
+        }
+        Function write_parameter {
+        }
+        Function make_void {
+        }
+        Function Univ_Step_Begin {
+        }
+        Function Univ_Step_End {
+        }
+        Function write_csv {
+        }
+        Function Univ_Finish {
+        }
+        Function make_rubble_mix {
+        }
+        Function make_rubble_board {
+        }
+        Function make_rubble_box {
+        }
+        Function make_rubble_Pillar {
+        }
+    }
+    Space Universe.map {
+    }
+    Agent Universe.map.insect {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+        Function calculate_repulsive {
+        }
+        Function sum_repulsive {
+        }
+        Function repulsive_insect {
+        }
+        Function repulsive_barrier {
+        }
+        Function get_surface {
+        }
+        Function decide_vector {
+        }
+        Function is_control {
+        }
+        Function cock_move {
+        }
+        Function is_disappear_surface {
+        }
+        Function jump_new_surface {
+        }
+        Function move_new_surface {
+        }
+        Function update_normal_vector {
+        }
+        Function calculate_theta {
+        }
+        Function matrix {
+        }
+        Function get_boundary {
+        }
+        Function update_touch {
+        }
+        Function back_surface {
+        }
+        Function prev_forward {
+        }
+        Function is_touch_new_surface {
+        }
+        Function do_peripheral {
+        }
+        Function along_wall {
+        }
+        Function empty_direction {
+        }
+        Function invade_central_zone {
+        }
+        Function decision_invade_angle {
+        }
+        Function touch_signal {
+        }
+        Function angle_invade {
+        }
+        Function normal_num {
+        }
+        Function is_stop_do_peripheral {
+        }
+        Function in_central {
+        }
+        Function decide_direction_and_distance {
+        }
+        Function Create_steps_of_random_walk {
+        }
+        Function distribution_time_of_random_walk {
+        }
+        Function do_stop {
+        }
+        Function do_central {
+        }
+        Function forward_one_step {
+        }
+        Function stop_insect {
+        }
+        Function Create_stop_time {
+        }
+        Function distribution_stop_time {
+        }
+        Function is_stop_central {
+        }
+        Function step_direction {
+        }
+        Function delete_touch_vector {
+        }
+        Function update_do_type {
+        }
+        Function update_normal {
+        }
+        Function is_step {
+        }
+        Function is_filled {
+        }
+        Function is_float {
+        }
+        Function back_step {
+        }
+        Function back_0 {
+        }
+        Function is_pause {
+        }
+        Function is_jump {
+        }
+        Function close_num {
+        }
+        Function check_void {
+        }
+    }
+    Agent Universe.map.barrier {
+        Function Agt_Init {
+        }
+        Function Agt_Step {
+        }
+    }
 }
