@@ -1493,6 +1493,9 @@ dim i as Integer
 		if my.state != COLOR_RED then
 			decide_direction_and_distance()
 		end if
+
+		update_do_type()
+		
 		forward_one_step()
 		if my.time_of_randomwalk > 0 then
 			my.time_of_randomwalk = my.time_of_randomwalk - 1
@@ -1611,14 +1614,12 @@ sub delete_touch_vector(){
 	end if
 }
 
-sub update_normal(){
-//normal‚Ì³•‰‚ğ‡‚í‚¹‚é
+sub update_do_type(){
 	dim i as Integer
 	dim n as Integer
-
+	
 	for i = 0 to 2
 		if my.normal_vector(i) != 0 then
-			my.normal_vector(i) = my.touch(i)
 			n = i
 		end if
 	next i
@@ -1648,6 +1649,18 @@ sub update_normal(){
 			my.do_type = 1
 		end if
 	end if
+}
+
+sub update_normal(){
+//normal‚Ì³•‰‚ğ‡‚í‚¹‚é
+	dim i as Integer
+	dim n as Integer
+
+	for i = 0 to 2
+		if my.normal_vector(i) != 0 then
+			my.normal_vector(i) = my.touch(i)
+		end if
+	next i
 }
 
 function is_step() as Boolean{
@@ -2758,6 +2771,8 @@ Model_Description {
         Function step_direction {
         }
         Function delete_touch_vector {
+        }
+        Function update_do_type {
         }
         Function update_normal {
         }
