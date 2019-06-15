@@ -96,7 +96,7 @@ Univ_Init{
 	CreateAgtMulti(universe.map.insect,universe.num_insect)
 	ClearConsoleScreen()
 	//make_rubble_mix(0.6)
-	//read_barrier()
+	read_barrier()
 	//make_void()
 	println("")
 	println("start")
@@ -494,7 +494,8 @@ function make_rubble_Pillar(pattern as Integer,x as Integer,y as integer ,z as i
 		ret = 0
 	end if
 	 
-	return re
+	return ret
+	}
 #end_rule UNIVERSE
 
 
@@ -623,17 +624,32 @@ function is_disappear_surface() as Boolean{
 		println("grid_al("&i&") : "&grid_al(i))
 	next i
 
-	if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0) + f(0),grid_al(1),grid_al(2)) then
+	if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0) + f(0),grid_al(1),grid_al(2)) and my.X==Int(my.X) then
 		ret = true
-		my.b_type = 0
-	else
-		if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0),grid_al(1)+f(1),grid_al(2)) then
-			ret = true
-			my.b_type = 1
+		if my.normal_vector(1) != 0 then
+			my.b_type = 2
 		else
-			if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0),grid_al(1),grid_al(2)+f(2)) then
+			my.b_type = 1
+		end if
+		println("b_type in dis(x)")
+	else
+		if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0),grid_al(1)+f(1),grid_al(2)) and my.Y==Int(my.Y) then
+			ret = true
+		if my.normal_vector(0) != 0 then
+			my.b_type = 2
+		else
+			my.b_type = 0
+		end if
+			println("b_type in dis y")
+		else
+			if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0),grid_al(1),grid_al(2)+f(2)) and my.Z==Int(my.Z) then
 				ret = true
-				my.b_type = 2
+				if my.normal_vector(1) != 0 then
+					my.b_type = 0
+				else
+					my.b_type = 1
+				end if
+				println("b_type in dis z")
 			else
 				ret = false
 			end if
@@ -1045,7 +1061,9 @@ sub update_touch() {
 		elseif grid(2) + f(2) > 39 then
 			my.touch(2) = -1
 		else
-			if universe.map.is_void(grid(0), grid(1) ,grid(2) - my.touch(2)) then
+			if grid(2) - my.touch(2) < 0 or grid(2) + f(2) < 0 then
+				my.touch(2) = 0
+			elseif universe.map.is_void(grid(0), grid(1) ,grid(2) - my.touch(2)) then
 				my.touch(2) = my.touch(2)
 			elseif universe.map.is_void(grid(0), grid(1) ,grid(2) + f(2)) and grid(2) == my.Z then
 				my.touch(2) = -f(2)
@@ -1342,7 +1360,7 @@ function in_central() as Boolean{
 		end if
 	next i
 	
-	if count > 1 then
+	if count > 1 or is_disappear_surface() then
 		ret = false
 	else
 		ret = True
@@ -2064,6 +2082,7 @@ function is_jump() as Boolean{
 	nz = Int(my.Z)
 	
 	type = my.do_type
+	println("do_type :"&my.do_type)
 
 	if type == 0 then
 		if my.normal_vector(1) == 0 then
@@ -2354,10 +2373,10 @@ Map_Output {
     Title = "aaa";
     Disable = No;
     Background_Color = 255, 255, 255;
-    Position_x = 1158;
-    Position_y = -1;
-    Size_x = 511;
-    Size_y = 829;
+    Position_x = 1540;
+    Position_y = 13;
+    Size_x = 639;
+    Size_y = 760;
     Map_Cell_Size = 1;
     Remarks = Yes;
     Legend_Pos = Top;
