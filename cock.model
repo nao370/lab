@@ -4,7 +4,7 @@
 //                                                                    /
 //====================================================================/
 
-Version = 4.2;
+Version = 4.0;
 
 
 
@@ -527,36 +527,26 @@ Agt_Step{
 	dim i as Integer
 
 	if my.normal_vector(0) == 0 and my.normal_vector(1) == 0 and my.normal_vector(2) == 0 then
-//		println("all 0")
 	for i = 0 to 2
-//		println("       touch ("&i&") : "&my.touch(i))
 		my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
 	next i
-//println(GetCountStep())
-	
-//		ExitSimulation()
 	end if
-/*	println("X is "&my.X)
-	println("Y is "&my.Y)
-	println("Z is "&my.Z)
-	println("")
-	for i = 0 to 2
-		println("touch ("&i&") : "&my.touch(i))
-	next i
-		for i = 0 to 2
-		println("pre_touch ("&i&") : "&my.pre_touch(i))
-	next i*/
+	cock_move()
+	back_0()
+}
+
+sub cock_move(){
+	dim i as Integer
+
 	if my.state == COLOR_BLUE then
 		do_stop()
 	else
 		if in_central() then
-//			println("do_central")
 			do_central()
 		else
 			my.state = COLOR_BLACK
 			if is_touch_new_surface() then
 				if Rnd() < 0.2 then
-//					println("move")
 					move_new_surface()
 					for i = 0 to 2
 						my.pre_touch(i) = my.touch(i)
@@ -565,35 +555,22 @@ Agt_Step{
 					for i = 0 to 2
 						my.pre_touch(i) = my.touch(i)
 					next i
-//									println("do_peripheral 1")
 					do_peripheral()
 				end if
 			elseif is_disappear_surface() then
 				if Rnd() < 0.2 then
-//				println("jump")
 					jump_new_surface()
 				else
 					for i = 0 to 2
 						my.pre_touch(i) = my.touch(i)
 					next i
-//									println("do_peripheral 2")
 					do_peripheral()
 				end if
 			else
-//				println("do_peripheral    3")
 				do_peripheral()
 			end if
 		end if
 	end if
-	back_0()
-/*	for i = 0 to 2
-		println("forward("&i&") is "&my.forward_vector(i))
-	next i
-	for i = 0 to 2
-		println("normal("&i&") is "&my.normal_vector(i))
-	next i
-	println("state is "&my.state)
-	println("--------------------------------------------------------------")*/
 }
 
 function is_disappear_surface() as Boolean{
@@ -2900,139 +2877,4 @@ Window_Rectangle {
 // Help Favorite Division
 //-------------------------------------------------------
 Help_Favorite {
-}
-
-
-//-------------------------------------------------------
-// Model Description Division
-//-------------------------------------------------------
-Model_Description {
-    Universe {
-        Function Univ_Init {
-        }
-        Function read_barrier {
-        }
-        Function write_parameter {
-        }
-        Function make_void {
-        }
-        Function Univ_Step_Begin {
-        }
-        Function Univ_Step_End {
-        }
-        Function write_csv {
-        }
-        Function Univ_Finish {
-        }
-        Function make_rubble_mix {
-        }
-        Function make_rubble_board {
-        }
-        Function make_rubble_box {
-        }
-        Function make_rubble_Pillar {
-        }
-    }
-    Space Universe.map {
-    }
-    Agent Universe.map.insect {
-        Function Agt_Init {
-        }
-        Function Agt_Step {
-        }
-        Function is_disappear_surface {
-        }
-        Function jump_new_surface {
-        }
-        Function move_new_surface {
-        }
-        Function update_normal_vector {
-        }
-        Function calculate_theta {
-        }
-        Function matrix {
-        }
-        Function get_boundary {
-        }
-        Function update_touch {
-        }
-        Function back_surface {
-        }
-        Function prev_forward {
-        }
-        Function is_touch_new_surface {
-        }
-        Function do_peripheral {
-        }
-        Function along_wall {
-        }
-        Function empty_direction {
-        }
-        Function invade_central_zone {
-        }
-        Function decision_invade_angle {
-        }
-        Function touch_signal {
-        }
-        Function angle_invade {
-        }
-        Function normal_num {
-        }
-        Function is_stop_do_peripheral {
-        }
-        Function in_central {
-        }
-        Function decide_direction_and_distance {
-        }
-        Function Create_steps_of_random_walk {
-        }
-        Function distribution_time_of_random_walk {
-        }
-        Function do_stop {
-        }
-        Function do_central {
-        }
-        Function forward_one_step {
-        }
-        Function stop_insect {
-        }
-        Function Create_stop_time {
-        }
-        Function distribution_stop_time {
-        }
-        Function is_stop_central {
-        }
-        Function step_direction {
-        }
-        Function delete_touch_vector {
-        }
-        Function update_do_type {
-        }
-        Function update_normal {
-        }
-        Function is_step {
-        }
-        Function is_filled {
-        }
-        Function is_float {
-        }
-        Function back_step {
-        }
-        Function back_0 {
-        }
-        Function is_pause {
-        }
-        Function is_jump {
-        }
-        Function close_num {
-        }
-        Function check_void {
-        }
-    }
-    Agent Universe.map.barrier {
-        Function Agt_Init {
-        }
-        Function Agt_Step {
-        }
-    }
 }
