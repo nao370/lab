@@ -96,7 +96,7 @@ Univ_Init{
 	CreateAgtMulti(universe.map.insect,universe.num_insect)
 	ClearConsoleScreen()
 	//make_rubble_mix(0.6)
-	read_barrier()
+	//read_barrier()
 	//make_void()
 	println("")
 	println("start")
@@ -494,7 +494,7 @@ function make_rubble_Pillar(pattern as Integer,x as Integer,y as integer ,z as i
 		ret = 0
 	end if
 	 
-	return ret
+	return re
 #end_rule UNIVERSE
 
 
@@ -1570,11 +1570,7 @@ function is_step() as Boolean{
 			ret = false
 		else
 			if not is_jump() then
-				if is_pause() then
-					ret = false
-				else
-					ret = true
-				end if
+				ret = true
 			else
 				ret = false
 			end if
