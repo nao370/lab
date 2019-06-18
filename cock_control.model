@@ -539,12 +539,9 @@ Agt_Step{
 		println("normal("&i&") is "&my.normal_vector(i))
 	next i
 	if my.normal_vector(0) == 0 and my.normal_vector(1) == 0 and my.normal_vector(2) == 0 then
-	/*for i = 0 to 2
+	for i = 0 to 2
 		my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
-	next i*/
-	println("normal 0")
-	println(GetCountStep())
-	ExitSimulation()
+	next i
 	end if
 	if is_control() then
 		println("control")
@@ -786,79 +783,6 @@ function is_disappear_surface() as Boolean{
 /*
 ç°Ç‹Ç≈Ç¢ÇÈñ Ç™ìrêÿÇÍÇΩÇÁtrue,ë±Ç¢ÇƒÇ¢ÇÁÇŒfalse
 */
-/*	dim f(3) as Integer
-	dim grid(3) as Integer
-	dim grid_al(3) as Integer
-	dim i as Integer
-	dim ret as Boolean
-
-	for i = 0 to 2
-		if my.forward_vector(i) < 0 then
-			f(i) = -1
-		elseif my.forward_vector(i) > 0 then
-			f(i) = 1
-		else
-			f(i) = 0
-		end if
-	next i
-
-	grid(0) = close_num(my.X) + f(0) - my.normal_vector(0)
-	grid(1) = close_num(my.Y) + f(1) - my.normal_vector(1)
-	grid(2) = close_num(my.Z) + f(2) - my.normal_vector(2)
-	
-	grid_al(0) = close_num(my.X) - my.normal_vector(0)
-	grid_al(1) = close_num(my.Y) - my.normal_vector(1)
-	grid_al(2) = close_num(my.Z) - my.normal_vector(2)
-
-	for i = 0 to 2
-		if grid(i) < 0 then
-			grid(i) = 0
-			ret = false
-			return ret
-		end if
-		if grid_al(i) < 0 then
-			grid_al(i) = 0
-			ret = false
-			return ret
-		end if
-		println("grid("&i&") : "&grid(i))
-	next i
-	for i = 0 to 2
-		println("grid_al("&i&") : "&grid_al(i))
-	next i
-
-	if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0) + f(0),grid_al(1),grid_al(2)) and my.X==Int(my.X) then
-		ret = true
-		if my.normal_vector(1) != 0 then
-			my.b_type = 2
-		else
-			my.b_type = 1
-		end if
-		println("b_type in dis(x)")
-	else
-		if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0),grid_al(1)+f(1),grid_al(2)) and my.Y==Int(my.Y) then
-			ret = true
-		if my.normal_vector(0) != 0 then
-			my.b_type = 2
-		else
-			my.b_type = 0
-		end if
-			println("b_type in dis y")
-		else
-			if not universe.map.is_void(grid(0),grid(1),grid(2)) and not universe.map.is_void(grid_al(0),grid_al(1),grid_al(2)+f(2)) and my.Z==Int(my.Z) then
-				ret = true
-				if my.normal_vector(1) != 0 then
-					my.b_type = 0
-				else
-					my.b_type = 1
-				end if
-				println("b_type in dis z")
-			else
-				ret = false
-			end if
-		end if
-	end if*/
-
 	dim type as Integer
 	dim ret as Boolean
 	dim nx as Integer
@@ -892,8 +816,12 @@ function is_disappear_surface() as Boolean{
 				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny,nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
-					ret = true
-					My.b_type = 1
+					if nx == my.X then
+						ret = true
+						My.b_type = 1
+					else
+						ret = false
+					end if
 				end if
 			end if
 		else
@@ -903,8 +831,12 @@ function is_disappear_surface() as Boolean{
 				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx+f(0),ny - my.normal_vector(1),nz) == 1 then
 					ret = false
 				else
-					ret = true
-					My.b_type = 2
+					if nx == my.X then
+						ret = true
+						My.b_type = 2
+					else
+						ret = false
+					end if
 				end if
 			end if
 		end if
@@ -956,8 +888,12 @@ function is_disappear_surface() as Boolean{
 				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
-					ret = true
-					My.b_type = 0
+					if ny == my.Y then
+						ret = true
+						My.b_type = 0
+					else
+						ret = false
+					end if
 				end if
 			end if
 		else
@@ -967,8 +903,12 @@ function is_disappear_surface() as Boolean{
 				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny+f(1),nz) == 1 then
 					ret = false
 				else
-					ret = true
-					My.b_type = 2
+					if ny == my.Y then
+						ret = true
+						My.b_type = 2
+					else
+						ret = false
+					end if
 				end if
 			end if
 		end if
@@ -1000,8 +940,12 @@ function is_disappear_surface() as Boolean{
 				if check_void(nx,ny - my.normal_vector(1),nz) == 1 and check_void(nx,ny - my.normal_vector(1),nz+f(2)) == 1 then
 					ret = false
 				else
-					ret = true
-					My.b_type = 0
+					if nz == my.Z then
+						ret = true
+						My.b_type = 0
+					else
+						ret = false
+					end if
 				end if
 			end if
 		else
@@ -1011,8 +955,12 @@ function is_disappear_surface() as Boolean{
 				if check_void(nx - my.normal_vector(0),ny,nz) == 1 and check_void(nx - my.normal_vector(0),ny,nz+f(2)) == 1 then
 					ret = false
 				else
-					ret = true
-					My.b_type = 1
+					if nz == my.Z then
+						ret = true
+						My.b_type = 1
+					else
+						ret = false
+					end if
 				end if
 			end if
 		end if
