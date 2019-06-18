@@ -1514,7 +1514,8 @@ sub update_touch() {
 			my.touch(2) = -1
 		else
 			if grid(2) - my.touch(2) < 0 or grid(2) + f(2) < 0 then
-				my.touch(2) = 1
+				my.touch(2) = 0
+				count = count + 1
 			elseif universe.map.is_void(grid(0), grid(1) ,grid(2) - my.touch(2)) and grid(2) == my.Z then
 				my.touch(2) = my.touch(2)
 			elseif universe.map.is_void(grid(0), grid(1) ,grid(2) + f(2)) and grid(2) == my.Z then
