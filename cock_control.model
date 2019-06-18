@@ -528,23 +528,12 @@ my.state = COLOR_BLACK
 Agt_Step{
 	dim i as Integer
 
-	println("---------------------------------------------------------")
-	println("X is :"&my.X)
-	println("Y is :"&my.Y)
-	println("Z is :"&my.Z)
-	for i = 0 to 2
-		println("touch("&i&") is "&my.touch(i))
-	next i
-		for i = 0 to 2
-		println("normal("&i&") is "&my.normal_vector(i))
-	next i
 	if my.normal_vector(0) == 0 and my.normal_vector(1) == 0 and my.normal_vector(2) == 0 then
-	for i = 0 to 2
-		my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
-	next i
+		for i = 0 to 2
+			my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
+		next i
 	end if
 	if is_control() then
-		println("control")
 		calculate_repulsive()
 		decide_vector()
 		forward_one_step()
@@ -552,7 +541,71 @@ Agt_Step{
 		cock_move()
 	end if
 	back_0()
+	back_empty()
 }
+
+sub back_empty() {
+
+	if is_filled() then
+		println("aaaa")
+		my.X = close_num(my.X)
+		my.Y = close_num(my.Y)
+		my.Z = close_num(my.Z)
+		if my.normal_vector(0) != 0 then
+			my.X = close_num(my.X) 
+			my.Y = close_num(my.Y) + 1
+			my.Z = close_num(my.Z) 
+			back_0()
+			if is_filled() then
+				my.X = close_num(my.X) 
+				my.Y = close_num(my.Y) 
+				my.Z = close_num(my.Z) + 1 
+				back_0()
+				if is_filled() then
+					my.X = close_num(my.X) 
+					my.Y = close_num(my.Y) - 1 
+					my.Z = close_num(my.Z)
+					back_0()
+				end if
+			end if
+		elseif my.normal_vector(1) != 0 then
+			my.X = close_num(my.X) +1
+			my.Y = close_num(my.Y) 
+			my.Z = close_num(my.Z) 
+			back_0()
+			if is_filled() then
+				my.X = close_num(my.X) 
+				my.Y = close_num(my.Y) 
+				my.Z = close_num(my.Z) + 1 
+				back_0()
+				if is_filled() then
+					my.X = close_num(my.X) - 1
+					my.Y = close_num(my.Y)  
+					my.Z = close_num(my.Z)
+					back_0()
+				end if
+			end if	
+		elseif my.normal_vector(2) != 0 then
+			my.X = close_num(my.X) 
+			my.Y = close_num(my.Y) + 1
+			my.Z = close_num(my.Z) 
+			back_0()
+			if is_filled() then
+				my.X = close_num(my.X) + 1 
+				my.Y = close_num(my.Y) 
+				my.Z = close_num(my.Z) 
+				back_0()
+				if is_filled() then
+					my.X = close_num(my.X) 
+					my.Y = close_num(my.Y) - 1 
+					my.Z = close_num(my.Z)
+					back_0()
+				end if
+			end if
+		end if
+	end if
+}
+
 sub calculate_repulsive(){
 	repulsive_insect()
 	repulsive_barrier()
@@ -764,7 +817,6 @@ sub cock_move(){
 				end if
 			elseif is_disappear_surface() then
 				if Rnd() < 0.2 then
-					println("jump")
 					jump_new_surface()
 				else
 					for i = 0 to 2
@@ -804,7 +856,6 @@ function is_disappear_surface() as Boolean{
 		else
 			f(i) = 0
 		end if
-		println("f("&i&") : "&f(i))
 	next i
 
 	ret = false
@@ -1029,7 +1080,6 @@ sub jump_new_surface(){
 		my.Y = my.Y + f(1)
 		my.Z = my.Z + f(2)
 		if b == 1 then
-			println("jump 1")
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
@@ -1037,7 +1087,6 @@ sub jump_new_surface(){
 			my.touch(1) = my.touch(1)
 			my.touch(2) = my.normal_vector(2)
 		else
-		println("jump 2")
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
@@ -1052,7 +1101,6 @@ sub jump_new_surface(){
 		my.Y = my.Y - pre(1)
 		my.Z = my.Z + f(2)
 		if b == 0 then
-		println("jump 3")
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
@@ -1060,7 +1108,6 @@ sub jump_new_surface(){
 			my.touch(1) = 0
 			my.touch(2) = my.normal_vector(2)
 		else
-		println("jump 4")
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
@@ -1075,7 +1122,6 @@ sub jump_new_surface(){
 		my.Z = my.Z - pre(2)
 		matrix()
 		if b == 1 then
-		println("jump 5")
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
@@ -1083,7 +1129,6 @@ sub jump_new_surface(){
 			my.touch(1) = my.touch(1)
 			my.touch(0) = my.normal_vector(0)
 		else
-		println("jump 6")
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
@@ -1111,7 +1156,6 @@ sub move_new_surface(){
 	dim pre(3) as Integer
 	dim f(3) as Double
 
-	println("move")
 	for i = 0 to 2
 		pre(i) = my.pre_touch(i)
 	next i
@@ -1129,7 +1173,6 @@ sub move_new_surface(){
 //	println("b = "&b)
 	my.ap_or_dis = 1
 	matrix()
-	println("n : "&n)
 	update_normal_vector(n)
 	forward_one_step()
 }
@@ -1318,12 +1361,6 @@ sub update_touch() {
 	dim i as Integer
 	dim count as Integer
 
-	println("")
-	println("          update_touch          ")
-	println("X "&my.X)
-	println("Y "&my.Y)
-	println("Z "&my.Z)
-			
 	grid(0) = close_num(my.X)
 	grid(1) = close_num(my.Y)
 	grid(2) = close_num(my.Z)
@@ -1334,7 +1371,6 @@ sub update_touch() {
 		else
 			f(i) = Abs(my.forward_vector(i)) / my.forward_vector(i)
 		end if
-		println("f("&i&") : "&f(i))
 	next i
 
 	count = 0
@@ -1490,7 +1526,6 @@ sub update_touch() {
 	end if
 
 	if count == 3 then
-		println("touch 0 in update touch")
 		for i = 0 to 2
 			my.touch(i) = GetHistory(my.touch(i),1)
 		next i 
@@ -1593,7 +1628,6 @@ sub do_peripheral(){
 //Žü•Ó•”‚Å‚Ç‚¤“®‚­‚©
 	if is_stop_do_peripheral() then
 		if Rnd() < 2/3 then //Žü•Ó•”‚ÅŽ~‚Ü‚é‚©A’†‰›•”‚É“ü‚é‚©
-			println("invade")
 			invade_central_zone()			
 		else
 	//		println("stop")
@@ -1907,9 +1941,6 @@ sub forward_one_step(){
 */
 	dim i as Integer
 
-	for i = 0 to 2
-		println("f("&i&") : "&my.forward_vector(i))
-	next i
 	step_direction()
 	if not is_step() then
 		back_step()
@@ -2068,16 +2099,13 @@ function is_step() as Boolean{
 
 	if is_filled() then
 		ret = false
-		println("fill")
 	else
 		if is_float() then
 			ret = false
-			println("float")
 		else
 			if not is_jump() then
 				ret = true
 			else
-				println("out jump")
 				ret = false
 			end if
 		end if
@@ -2099,10 +2127,8 @@ function is_filled() as Boolean{
 	x(1) = my.Y
 	x(2) = my.Z
 
-		//DebugStr("‹ß‚¢ƒ}ƒX")
 	for i = 0 to 2
 		a(i) = close_num(x(i))
-		//DebugStr("a("&i&")"&"is"&a(i))
 	next i
 
 	ret = false
@@ -2119,9 +2145,6 @@ function is_filled() as Boolean{
 	 	for i = 0 to (1 + g(0))
 			if check_void(a(0)-g(0)+i,a(1)-g(1)+j,a(2)-g(2)+k) == 1 then
 	 			if abs(a(0) - g(0) + i  - my.X) < 1 and abs(a(1) - g(1) + j  - my.y) < 1 and abs(a(2) - g(2) + k  - my.z) < 1 then
-	 				println("X is " & a(0) - g(0) + i)
-	 				println("Y is " & a(1) - g(1) + j)
-	 				println("Z is " & a(2) - g(2) + k)
 	 				ret = true
 	 				return ret
 	 			end if
@@ -2574,13 +2597,6 @@ function is_jump() as Boolean{
 	ny = Int(my.Y)
 	nz = Int(my.Z)
 
-println("     in jump")
-	println("  X : "&my.X)
-	println("  Y : "&my.Y)
-	println("  Z : "&my.Z)
-	println("  nX : "&nX)
-	println("  nY : "&nY)
-	println("  nZ : "&nZ)
 
 	if my.X == nx then
 		f(0) = 0 
