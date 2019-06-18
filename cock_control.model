@@ -1932,7 +1932,7 @@ function Create_stop_time() as Integer{
 	func = 0
 	prob = 0
 	Do Until prob < func
-	steps = Int(Rnd() * 10000) + 1
+	steps = Int(Rnd() * 1000) + 1
 	prob = Rnd()
 	
 	func = distribution_stop_time(steps)
