@@ -495,7 +495,6 @@ function make_rubble_Pillar(pattern as Integer,x as Integer,y as integer ,z as i
 	end if
 	 
 	return ret
-	}
 #end_rule UNIVERSE
 
 
@@ -760,6 +759,7 @@ sub cock_move(){
 				end if
 			elseif is_disappear_surface() then
 				if Rnd() < 0.2 then
+					println("jump")
 					jump_new_surface()
 				else
 					for i = 0 to 2
@@ -864,7 +864,6 @@ function is_disappear_surface() as Boolean{
 	nz = close_num(my.Z)//Int(my.Z)
 	type = my.do_type
 
-
 	for i = 0 to 2
 		if my.forward_vector(i) < 0 then
 			f(i) = -1
@@ -873,6 +872,7 @@ function is_disappear_surface() as Boolean{
 		else
 			f(i) = 0
 		end if
+		println("f("&i&") : "&f(i))
 	next i
 
 	ret = false
@@ -905,14 +905,14 @@ function is_disappear_surface() as Boolean{
 			ret = false
 		else
 			if ny == my.Y then
-				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny,nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny+f(1),nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					ret = true
 					My.b_type = 0
 				end if
 			elseif nx == my.X then
-				if check_void(nx,ny ,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 then
+				if check_void(nx,ny ,nz - my.normal_vector(2)) == 1 and check_void(nx,ny+f(1),nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny ,nz - my.normal_vector(2)) == 1 and check_void(nx+f(0),ny+f(1),nz - my.normal_vector(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -925,14 +925,14 @@ function is_disappear_surface() as Boolean{
 			ret = false
 		else
 			if nz == my.z then
-				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+f(0),ny- my.normal_vector(1),nz) == 1 then
+				if check_void(nx,ny- my.normal_vector(1),nz) == 1 and check_void(nx+f(0),ny- my.normal_vector(1),nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+f(2)) == 1 and check_void(nx+f(0),ny- my.normal_vector(1),nz+f(2)) == 1 then
 					ret = false
 				else
 					ret = true
 					My.b_type = 0
 				end if
 			elseif nx == my.X then
-				if check_void(nx,ny- my.normal_vector(1) ,nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+f(2)) == 1 then
+				if check_void(nx,ny- my.normal_vector(1) ,nz) == 1 and check_void(nx,ny- my.normal_vector(1),nz+f(2)) == 1 and check_void(nx+f(0),ny- my.normal_vector(1) ,nz) == 1 and check_void(nx+f(0),ny- my.normal_vector(1),nz+f(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -969,14 +969,14 @@ function is_disappear_surface() as Boolean{
 			ret = false
 		else
 			if nz == my.z then
-				if check_void(nx- my.normal_vector(0),ny,nz)==1 and check_void(nx- my.normal_vector(0),ny+f(1),nz) == 1 then
+				if check_void(nx- my.normal_vector(0),ny,nz)==1 and check_void(nx- my.normal_vector(0),ny+f(1),nz) == 1 And check_void(nx- my.normal_vector(0),ny,nz+f(2))==1 and check_void(nx- my.normal_vector(0),ny+f(1),nz+f(2)) == 1 then
 					ret = false
 				else
 					ret = true
 					My.b_type = 1
 				end if
 			elseif ny == my.y then
-				if check_void(nx- my.normal_vector(0),ny ,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+f(2)) == 1 then
+				if check_void(nx- my.normal_vector(0),ny ,nz) == 1 and check_void(nx- my.normal_vector(0),ny,nz+f(2)) == 1 and check_void(nx- my.normal_vector(0),ny+f(1) ,nz) == 1 and check_void(nx- my.normal_vector(0),ny+f(1),nz+f(2)) == 1 then
 					ret = false
 				else
 					ret = true
@@ -1354,6 +1354,7 @@ sub update_touch() {
 	dim i as Integer
 
 	println("")
+	println("          update_touch          ")
 	println("X "&my.X)
 	println("Y "&my.Y)
 	println("Z "&my.Z)
@@ -1368,13 +1369,9 @@ sub update_touch() {
 		else
 			f(i) = Abs(my.forward_vector(i)) / my.forward_vector(i)
 		end if
-	//	println("f("&i&") : "&f(i))
+		println("f("&i&") : "&f(i))
 	next i
 
-/*	for i = 0 to 2
-		println("grid("&i&") : "&grid(i))
-	next i
-*/
 	if my.X == 1 then
 	//f(0) > 0 ‚Å‚ ‚ê‚Î•’Ê‚É”»’è(0 or -1)
 	//‚»‚êˆÈŠO‚Ítouch = 1
@@ -1586,7 +1583,7 @@ sub do_peripheral(){
 //ü•Ó•”‚Å‚Ç‚¤“®‚­‚©
 	if is_stop_do_peripheral() then
 		if Rnd() < 2/3 then //ü•Ó•”‚Å~‚Ü‚é‚©A’†‰›•”‚É“ü‚é‚©
-//			println("invade")
+			println("invade")
 			invade_central_zone()			
 		else
 	//		println("stop")
@@ -2860,7 +2857,7 @@ Repeat_Simulation {
     }
     Initial_Value_Change_Linear {
         Variable_Name = "universe.T_ex";
-        Exec_Times_Same_Value = 10;
+        Exec_Times_Same_Value = 1;
         Start_Value = 3.0;
         Step_Value = 1.0;
         End_Value = 3.0;
@@ -2877,11 +2874,11 @@ Map_Output {
     Title = "aaa";
     Disable = No;
     Background_Color = 255, 255, 255;
-    Position_x = 1059;
-    Position_y = 25;
+    Position_x = 1044;
+    Position_y = -2;
     Size_x = 882;
     Size_y = 735;
-    Map_Cell_Size = 1;
+    Map_Cell_Size = 0;
     Remarks = Yes;
     Legend_Pos = Top;
     Font_Name = "Dialog";
@@ -3012,8 +3009,8 @@ Others_Data {
     Debug_Position_y = 28;
     Debug_Size_x = 400;
     Debug_Size_y = 200;
-    Console_Position_x = 9;
-    Console_Position_y = 72;
+    Console_Position_x = -1;
+    Console_Position_y = -6;
     Console_Size_x = 360;
     Console_Size_y = 737;
     Componen_Tree_Position_x = -24;
