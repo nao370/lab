@@ -535,6 +535,9 @@ Agt_Step{
 	for i = 0 to 2
 		println("touch("&i&") is "&my.touch(i))
 	next i
+		for i = 0 to 2
+		println("normal("&i&") is "&my.normal_vector(i))
+	next i
 	if my.normal_vector(0) == 0 and my.normal_vector(1) == 0 and my.normal_vector(2) == 0 then
 	/*for i = 0 to 2
 		my.normal_vector(i) = GetHistory(my.normal_vector(i),1)
@@ -544,6 +547,7 @@ Agt_Step{
 	ExitSimulation()
 	end if
 	if is_control() then
+		println("control")
 		calculate_repulsive()
 		decide_vector()
 		forward_one_step()
@@ -1077,6 +1081,7 @@ sub jump_new_surface(){
 		my.Y = my.Y + f(1)
 		my.Z = my.Z + f(2)
 		if b == 1 then
+			println("jump 1")
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
@@ -1084,6 +1089,7 @@ sub jump_new_surface(){
 			my.touch(1) = my.touch(1)
 			my.touch(2) = my.normal_vector(2)
 		else
+		println("jump 2")
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
@@ -1098,6 +1104,7 @@ sub jump_new_surface(){
 		my.Y = my.Y - pre(1)
 		my.Z = my.Z + f(2)
 		if b == 0 then
+		println("jump 3")
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = f(2)
@@ -1105,6 +1112,7 @@ sub jump_new_surface(){
 			my.touch(1) = 0
 			my.touch(2) = my.normal_vector(2)
 		else
+		println("jump 4")
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
@@ -1119,6 +1127,7 @@ sub jump_new_surface(){
 		my.Z = my.Z - pre(2)
 		matrix()
 		if b == 1 then
+		println("jump 5")
 			my.normal_vector(0) = f(0)
 			my.normal_vector(1) = 0
 			my.normal_vector(2) = 0
@@ -1126,6 +1135,7 @@ sub jump_new_surface(){
 			my.touch(1) = my.touch(1)
 			my.touch(0) = my.normal_vector(0)
 		else
+		println("jump 6")
 			my.normal_vector(0) = 0
 			my.normal_vector(1) = f(1)
 			my.normal_vector(2) = 0
@@ -1171,6 +1181,7 @@ sub move_new_surface(){
 //	println("b = "&b)
 	my.ap_or_dis = 1
 	matrix()
+	println("n : "&n)
 	update_normal_vector(n)
 	forward_one_step()
 }
