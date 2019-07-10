@@ -496,7 +496,6 @@ function make_rubble_Pillar(pattern as Integer,x as Integer,y as integer ,z as i
 	 
 	return ret 
 	}
-	
 #end_rule UNIVERSE
 
 
@@ -545,6 +544,7 @@ Agt_Step{
 			println(" pre normal("&i&") : "&my.normal_vector(i))
 		next i
 	end if
+		debug()
 	if is_control() then
 		calculate_repulsive()
 		decide_vector()
@@ -554,7 +554,123 @@ Agt_Step{
 	end if
 	back_0()
 	back_empty()
-	
+
+
+}
+
+sub debug(){
+//Ç¢ÇØÇ»Ç¢ÇÕÇ∏ÇÃèÍèäÇ…çsÇ¡ÇƒÇÈÇÃÇ≈4Ç©èäå©ÇƒÉ_ÉÅÇæÇ¡ÇΩÇÁé~Ç‹ÇÈ
+//
+	dim x as Integer
+	dim y as Integer
+	dim z as Integer
+
+	println("X : "&my.X)
+	println("Y : "&my.Y)
+	println("Z : "&my.Z)
+
+	if my.normal_vector(0) != 0 then
+		z = Int(my.Z)
+		y = Int(my.Y)
+
+		if z == my.Z then
+			if y == my.Y then
+				if check_void(my.X - my.normal_vector(0),y,z) == 0 then
+				println("z : "&z)
+					println("y : "&y)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			else
+				if check_void(my.X - my.normal_vector(0),y,z) == 0 or check_void(my.X - my.normal_vector(0),y+1,z) == 0 then
+								println("z : "&z)
+					println("y : "&y)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			end if
+		else
+			if y == my.Y then
+				if check_void(my.X - my.normal_vector(0),y,z) == 0 or check_void(my.X - my.normal_vector(0),y,z+1) == 0 then
+								println("z : "&z)
+					println("y : "&y)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			else
+				if check_void(my.X - my.normal_vector(0),y,z) == 0 or check_void(my.X - my.normal_vector(0),y,z+1) == 0 or check_void(my.X - my.normal_vector(0),y+1,z) == 0 or check_void(my.X - my.normal_vector(0),y+1,z+1) == 0 then
+								println("z : "&z)
+					println("y : "&y)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			end if		
+		end if
+	elseif my.normal_vector(1) != 0 then
+		x = Int(my.X)
+		Z = Int(my.Z)
+
+		if x == my.X then
+			if z == my.Z then
+				if check_void(x,my.Y - my.normal_vector(1),z) == 0 then
+					println("x : "&x)
+					println("z : "&z)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			else
+				if check_void(x,my.Y - my.normal_vector(1),z) == 0 or check_void(x,my.Y - my.normal_vector(1),z+1) == 0 then
+									println("x : "&x)
+					println("z : "&z)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			end if
+		else
+			if z == my.Z then
+				if check_void(x,my.Y - my.normal_vector(1),z) == 0 or check_void(x+1,my.Y - my.normal_vector(1),z) == 0 then
+									println("x : "&x)
+					println("z : "&z)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			else
+				if check_void(x,my.Y - my.normal_vector(1),z) == 0 or check_void(x+1,my.Y - my.normal_vector(1),z) == 0 or check_void(x,my.Y - my.normal_vector(1),z+1) == 0 or check_void(x+1,my.Y - my.normal_vector(1),z+1)== 0 then
+									println("x : "&x)
+					println("z : "&z)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			end if		
+		end if
+	elseif my.normal_vector(2) != 0 then
+		x = Int(my.X)
+		y = Int(my.Y)
+
+		if x == my.X then
+			if y == my.Y then
+				if check_void(x,y,my.Z - my.normal_vector(2)) == 0 then
+					println("x : "&x)
+					println("y : "&y)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			else
+				if check_void(x,y,my.Z - my.normal_vector(2)) == 0 or check_void(x,y+1,my.Z - my.normal_vector(2)) == 0 then
+				println("x : "&x)
+					println("y : "&y)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			end if
+		else
+			if y == my.Y then
+				if check_void(x,y,my.Z - my.normal_vector(2)) == 0 or check_void(x+1,y,my.Z - my.normal_vector(2)) == 0 then
+				println("x : "&x)
+					println("y : "&y)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			else
+				if check_void(x,y,my.Z - my.normal_vector(2)) == 0 or check_void(x+1,y,my.Z - my.normal_vector(2)) == 0 or check_void(x,y+1,my.Z - my.normal_vector(2)) == 0 or check_void(x+1,y+1,my.Z - my.normal_vector(2)) == 0 then
+				println("x : "&x)
+					println("y : "&y)
+					ExitSimulationMsgLn("jump miss")
+				end if
+			end if		
+		end if
+	else
+		ExitSimulationMsgLn("normal miss")
+	end if
 }
 
 sub back_empty() {
@@ -693,7 +809,7 @@ sub repulsive_barrier(){
 	if n == 0 then
 		for i = 0 to 4
 			for j = 0 to 4
-				if check_void(position(0),position(1) - 2 + i ,position(2) - 2 + j) then
+				if check_void(position(0),position(1) - 2 + i ,position(2) - 2 + j) == 1 then
 					diff(0) = 0
 					diff(1) = my.Y - position(1) - 2 + i
 					diff(2) = my.Z - position(2) - 2 + j
@@ -710,7 +826,7 @@ sub repulsive_barrier(){
 	elseif n == 1 then
 		for i = 0 to 4
 			for j = 0 to 4
-				if check_void(position(0) - 2 + i,position(1),position(2) - 2 + j) then
+				if check_void(position(0) - 2 + i,position(1),position(2) - 2 + j) == 1 then
 					diff(0) = my.X - position(0) - 2 + i
 					diff(1) = 0
 					diff(2) = my.Z - position(2) - 2 + j
@@ -727,7 +843,7 @@ sub repulsive_barrier(){
 	elseif n == 2 then
 		for i = 0 to 4
 			for j = 0 to 4
-				if check_void(position(0) - 2 + i,position(1) - 2 + j,position(2)) then
+				if check_void(position(0) - 2 + i,position(1) - 2 + j,position(2)) == 1 then
 					diff(0) = my.X - position(0) - 2 + i
 					diff(1) = my.Y - position(1) - 2 + j
 					diff(2) = 0
@@ -816,7 +932,8 @@ sub cock_move(){
 		else
 			my.state = COLOR_BLACK
 			if is_touch_new_surface() then
-				if Rnd() < 0.2 then
+				if Rnd() < 0.2 and is_movable() then
+				println("move")
 					move_new_surface()
 					for i = 0 to 2
 						my.pre_touch(i) = my.touch(i)
@@ -829,6 +946,7 @@ sub cock_move(){
 				end if
 			elseif is_disappear_surface() then
 				if Rnd() < 0.2 then
+				println("jump")
 					jump_new_surface()
 				else
 					for i = 0 to 2
@@ -841,6 +959,128 @@ sub cock_move(){
 			end if
 		end if
 	end if
+}
+
+function is_movable() as Boolean{
+	dim n as Integer
+	dim i as Integer
+	dim ret as Boolean
+	dim x as Integer
+	dim y as Integer
+	dim z as Integer
+	
+	n = -1
+	for i = 0 to 2
+		if my.touch(i) != 0 and my.pre_touch(i) != my.touch(i) then
+			n = i
+		end if
+		my.pre_touch(i) = my.touch(i)
+	next i
+
+	if n == 0 then
+		z = Int(my.Z)
+		y = Int(my.Y)
+
+		if z == my.Z then
+			if y == my.Y then
+				if check_void(my.X - my.normal_vector(0),y,z) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			else
+				if check_void(my.X - my.normal_vector(0),y,z) == 0 or check_void(my.X - my.normal_vector(0),y+1,z) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			end if
+		else
+			if y == my.Y then
+				if check_void(my.X - my.normal_vector(0),y,z) == 0 or check_void(my.X - my.normal_vector(0),y,z+1) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			else
+				if check_void(my.X - my.normal_vector(0),y,z) == 0 or check_void(my.X - my.normal_vector(0),y,z+1) == 0 or check_void(my.X - my.normal_vector(0),y+1,z) == 0 or check_void(my.X - my.normal_vector(0),y+1,z+1) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			end if		
+		end if
+	elseif n == 1 then
+		x = Int(my.X)
+		Z = Int(my.Z)
+
+		if x == my.X then
+			if z == my.Z then
+				if check_void(x,my.Y - my.normal_vector(1),z) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			else
+				if check_void(x,my.Y - my.normal_vector(1),z) == 0 or check_void(x,my.Y - my.normal_vector(1),z+1) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			end if
+		else
+			if z == my.Z then
+				if check_void(x,my.Y - my.normal_vector(1),z) == 0 or check_void(x+1,my.Y - my.normal_vector(1),z) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			else
+				if check_void(x,my.Y - my.normal_vector(1),z) == 0 or check_void(x+1,my.Y - my.normal_vector(1),z) == 0 or check_void(x,my.Y - my.normal_vector(1),z+1) == 0 or check_void(x+1,my.Y - my.normal_vector(1),z+1)== 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			end if		
+		end if	
+	elseif n == 2 then
+		x = Int(my.X)
+		y = Int(my.Y)
+
+		if x == my.X then
+			if y == my.Y then
+				if check_void(x,y,my.Z - my.normal_vector(2)) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			else
+				if check_void(x,y,my.Z - my.normal_vector(2)) == 0 or check_void(x,y+1,my.Z - my.normal_vector(2)) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			end if
+		else
+			if y == my.Y then
+				if check_void(x,y,my.Z - my.normal_vector(2)) == 0 or check_void(x+1,y,my.Z - my.normal_vector(2)) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			else
+				if check_void(x,y,my.Z - my.normal_vector(2)) == 0 or check_void(x+1,y,my.Z - my.normal_vector(2)) == 0 or check_void(x,y+1,my.Z - my.normal_vector(2)) == 0 or check_void(x+1,y+1,my.Z - my.normal_vector(2)) == 0 then
+					ret = false
+				else
+					ret = true
+				end if
+			end if		
+		end if		
+	else
+		ExitSimulationMsgLn("touch miss in is_movable")
+	end if
+
+	return ret
 }
 
 function is_disappear_surface() as Boolean{
@@ -1169,20 +1409,14 @@ sub move_new_surface(){
 	dim f(3) as Double
 
 	for i = 0 to 2
-		pre(i) = my.pre_touch(i)
-	next i
-
-	for i = 0 to 2
 		if my.touch(i) != 0 and my.pre_touch(i) != my.touch(i) then
 			n = i
 		end if
 		my.pre_touch(i) = my.touch(i)
 	next i
 
-//	println("  n = "&n)
 	b = get_boundary(n)
 	my.b_type = b
-//	println("b = "&b)
 	my.ap_or_dis = 1
 	matrix()
 	update_normal_vector(n)
@@ -2836,6 +3070,7 @@ function close_num(x as Double) as Integer{
 }
 
 function check_void(x as Double,y as Double,z as Double) as Integer{
+// ñÑÇ‹Ç¡ÇƒÇ¢ÇΩÇÁ 1 ãÛÇ¢ÇƒÇ¢ÇΩÇÁ 0 äOÇ»ÇÁ-1
 	dim ret as Integer
 	dim max(3) as Integer
 
@@ -2850,7 +3085,7 @@ function check_void(x as Double,y as Double,z as Double) as Integer{
 	else
 		return 0
 	end if
-	}
+	
 #end_rule UNIVERSE.MAP.INSECT
 
 
@@ -2895,9 +3130,9 @@ Single_Simulation {
 // Simulation Loop Definition Division
 //-------------------------------------------------------
 Repeat_Simulation {
-    Value_Change = Linear;
+    Value_Change = None;
     Initial_Value_Change_None {
-        Repeat_Max = 7;
+        Repeat_Max = 1;
     }
     Initial_Value_Change_Linear {
         Variable_Name = "universe.T_ex";
@@ -3053,10 +3288,10 @@ Others_Data {
     Debug_Position_y = 28;
     Debug_Size_x = 400;
     Debug_Size_y = 200;
-    Console_Position_x = 11;
-    Console_Position_y = 201;
+    Console_Position_x = -3;
+    Console_Position_y = 0;
     Console_Size_x = 360;
-    Console_Size_y = 737;
+    Console_Size_y = 1274;
     Componen_Tree_Position_x = -24;
     Componen_Tree_Position_y = -3;
     Componen_Tree_Size_x = 250;
@@ -3114,7 +3349,7 @@ Space_Map_Initial_Value {
 // Window Location Definition Division
 //-------------------------------------------------------
 Window_Rectangle {
-    Window_Name = Main_Window, -9, -9, 2578, 1408;
+    Window_Name = Main_Window, -8, 0, 1296, 1398;
     Window_Name = Output_Setting_Window, 1064, 529, 480, 350;
     Window_Name = Artisoc_Help_Window, 10, 10, 730, 732;
     Window_Name = Map_3D_Setting_Window, 631, 271, 680, 500;
@@ -3166,6 +3401,8 @@ Model_Description {
         }
         Function Agt_Step {
         }
+        Function debug {
+        }
         Function back_empty {
         }
         Function calculate_repulsive {
@@ -3183,6 +3420,8 @@ Model_Description {
         Function is_control {
         }
         Function cock_move {
+        }
+        Function is_movable {
         }
         Function is_disappear_surface {
         }
